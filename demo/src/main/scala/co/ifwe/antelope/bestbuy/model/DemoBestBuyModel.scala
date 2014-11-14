@@ -54,7 +54,7 @@ class DemoBestBuyModel extends Model[ProductSearchScoringContext] {
 
   class TfIdfFeature extends Feature[SC] {
     val terms = counter(skuUpdated,productNameUpdatedTerms)
-    val docsWithTerm = set(productNameUpdatedTerms,skuViewed)
+    val docsWithTerm = set(productNameUpdatedTerms,skuUpdated)
     val docs = set(skuUpdated)
     override def score(implicit ctx: SC) = {
       val queryTerms = ctx.query.normalize.split(" ")
