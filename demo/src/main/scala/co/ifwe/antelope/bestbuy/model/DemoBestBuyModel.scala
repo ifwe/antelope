@@ -45,10 +45,10 @@ class DemoBestBuyModel extends Model[ProductSearchScoringContext] {
   }
 
   class TermPopularity extends Feature[SC] {
-    val ct = s.counter(skuViewed, queryTerms)
+    val ct = s.counter(queryTerms, skuViewed)
     override def score(implicit ctx: SC) = {
       val queryTerms = normalize(ctx.query).split(" ")
-      id => queryTerms.map(term => ct(id, term) div ct()).product
+      id => queryTerms.map(term => ct(term, id) div ct(term)).product
     }
   }
 
