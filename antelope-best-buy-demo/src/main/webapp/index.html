@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>Best Buy Demo Browser</title>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+        <script>
+            var formApp = angular.module('formApp', []);
+            function formController($scope, $http) {
+                $scope.formData = {};
+                $scope.showProductDetail = false;
+
+                $scope.processForm = function() {
+                    $http({
+                        method  : 'POST',
+                        url     : '/search',
+                        data    : $.param($scope.formData),  // pass in data as strings
+                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }
+                     })
+                      .success(function(data) {
+                        // console.log(data);
+                        if (!data.success) {
+                          console.log("NO success :(");
+                          // if not successful, bind errors to error variables
+                          //$scope.errorQuery = data.errors.name;
+                        } else {
+                          // console.log("success!!");
+                          // if successful, bind success message to message
+                          $scope.results = data.results;
+                        }
+                      });
+                };
+
+                $scope.showDetail = function($sku) {
+                    $http({
+                        method  : 'GET',
+                        url     : '/details',
+                        params  : { sku: $sku }
+                    })
+                     .success(function(data) {
+                        // console.log(data);
+                        $scope.showProductDetail = true;
+                        $scope.productDetail = data;
+                     });
+                };
+            }
+        </script>
+    </head>
+    <body ng-app="formApp" ng-controller="formController">
+        <h1>Best Buy Demo Browser</h1>
+        <form ng-submit="processForm()">
+            <!-- NAME -->
+            <div id="query-group" class="form-group">
+                <label>Query</label>
+                <input type="text" name="query" class="form-control" placeholder="Search now" autofocus="autofocus" ng-model="formData.query">
+                <span class="help-block"></span>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" class="btn btn-success btn-lg btn-block">
+                <span class="glyphicon glyphicon-flash"></span> Submit!
+            </button>
+        </form>
+
+        <h2>Search Query Result</h2>
+        <ul>
+            <li ng-repeat="(rn, res) in results">
+                <button ng-click="showDetail(res.sku)">Detail</button>
+                {{ res.sku}} : {{ res.title }}
+            </li>
+        </ul>
+        <div ng-show="showProductDetail">
+            <div> Title: {{ productDetail.title }} </div>
+            <div> Description: {{ productDetail.description }} </div>
+        </div>
+    </body>
+</html>
