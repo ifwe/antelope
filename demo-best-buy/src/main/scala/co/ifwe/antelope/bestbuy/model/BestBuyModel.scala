@@ -31,9 +31,24 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
     case pu: ProductUpdate => pu.sku
   }
 
+//  val spellCheck
+
+//  override def update: Unit = {
+//    def update(e: Event): Unit = {
+//
+//    }
+//  }
+
   feature(new OverallPopularityFeature(skuSelected))
+//  for (te <- List(terms, bigrams, spellCheckedTerms)) {
   for (te <- List(terms, bigrams)) {
     feature(new TermPopularityFeature(skuSelected, new TermsFromText(te)))
     feature(new TfIdfFeature(catalogSku, new TermsProductUpdate(te)))
   }
+
+//  feature(new Feature[ProductSearchScoringContext] {
+//    override def score(implicit ctx: ProductSearchScoringContext): (Long) => Double = {
+//
+//    }
+//  })
 }
