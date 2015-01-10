@@ -1,1 +1,14 @@
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+.productDetail .productTitle {
+  font-weight: bold;
+}
+.searchResults .searchResult:hover {
+  background: #e6e6e6;
+}
+.searchResults .resultTitle:hover {
+  text-decoration: underline;
+}
+.searchResults .searchResult .resultSku {
+  font-weight: lighter;
+  text-align: right;
+}

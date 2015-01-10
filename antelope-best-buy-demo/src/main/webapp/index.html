@@ -1,6 +1,8 @@
 <html>
     <head>
         <title>Best Buy Demo Browser</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
         <link rel="stylesheet" href="res/css/styles.css" />
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -30,6 +32,7 @@
                           // console.log("success!!");
                           // if successful, bind success message to message
                           $scope.results = data.results;
+                          $scope.showProductDetail = false;
                         }
                       });
                 };
@@ -63,33 +66,33 @@
     <body ng-app="formApp" ng-controller="formController">
         <div class="container">
             <h1>Best Buy Demo Browser</h1>
-            <form ng-submit="processForm()">
-                <!-- NAME -->
-                <div id="query-group" class="form-group">
-                    <label>Query</label>
-                    <input type="text" name="query" class="form-control" placeholder="Search now"
+            <form class="row" ng-submit="processForm()" role="form">
+                <div id="query-group" class="form-group col-sm-6">
+                    <label class="sr-only" for="query">Query</label>
+                    <input type="text" id="query" name="query" class="form-control" placeholder="Search now"
                            autofocus="autofocus" ng-model="formData.query"
                            autocomplete="off" typeahead="suggestion for suggestion in suggest($viewValue)"
                            typeahead-on-select="processForm()" typeahead-focus-first="false" >
-                    <span class="help-block"></span>
                 </div>
-
-                <!-- SUBMIT BUTTON -->
-                <button type="submit" class="btn btn-success btn-lg btn-block">
-                    <span class="glyphicon glyphicon-flash"></span> Submit!
-                </button>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-success btn-primary btn-block">Submit!</button>
+                </div>
             </form>
 
-            <h2>Search Query Result</h2>
-            <ul>
-                <li ng-repeat="(rn, res) in results">
-                    <button ng-click="showDetail(res.sku)">Detail</button>
-                    {{ res.sku}} : {{ res.title }}
-                </li>
-            </ul>
-            <div ng-show="showProductDetail">
-                <div> Title: {{ productDetail.title }} </div>
-                <div> Description: {{ productDetail.description }} </div>
+            <div><h2>Search Query Result</h2></div>
+            <div class="row">
+                <div class="searchResults col-sm-6">
+                    <div ng-repeat="(rn, res) in results">
+                        <div class="searchResult row" ng-click="showDetail(res.sku)">
+                            <div class="resultTitle col-sm-10">{{ res.title }}</div>
+                            <div class="resultSku col-sm-2">{{ res.sku }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="productDetail col-sm-6" ng-show="showProductDetail">
+                    <div class="productTitle"> {{ productDetail.title }} </div>
+                    <div class="productDescription"> {{ productDetail.description }} </div>
+                </div>
             </div>
         </div>
     </body>
