@@ -34,6 +34,11 @@ class State[T <: ScoringContext] {
     def apply(k: T1): Long
   }
 
+  trait StringPrefixCounter extends Counter {
+    def apply(k: String): Long
+    def prefixSearch(prefix: String): Iterable[(String,Long)]
+  }
+
   trait Set {
     def add: PartialFunction[Event, Unit]
     def size(): Long
@@ -129,6 +134,43 @@ class State[T <: ScoringContext] {
       override def toString(): String = {
         m.toString()
       }
+    })
+  }
+
+  def stringPrefixCounter(d: IterableUpdateDefinition[String]) = {
+    registerCounter(new StringPrefixCounter {
+      val f = d.getFunction
+      val m = new java.util.TreeMap[String, Long]()
+      var totalCt = 0L
+
+      override def increment: PartialFunction[Event, Unit] = f andThen (x => x.foreach {
+        k => {
+          m.put(k, m.getOrDefault(k, 0) + 1)
+          totalCt += 1
+        }
+      })
+
+      override def apply(k: String): Long = {
+        m.getOrDefault(k, 0L)
+      }
+
+      override def apply(): Long = totalCt
+
+      private def incLastChar(x: String) = {
+        x.substring(0, x.length - 1) + (x.charAt(x.length - 1) + 1).toChar
+      }
+
+      override def prefixSearch(prefix: String): Iterable[(String, Long)] = {
+        import collection.JavaConversions._
+        for (e: java.util.Map.Entry[String, Long] <- m.subMap(prefix, incLastChar(prefix)).entrySet()) yield {
+          e.getKey -> e.getValue
+        }
+      }
+
+      override def toString(): String = {
+        m.toString()
+      }
+
     })
   }
 

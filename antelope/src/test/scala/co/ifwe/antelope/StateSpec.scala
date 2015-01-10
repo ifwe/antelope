@@ -9,6 +9,10 @@ class StateSpec extends FlatSpec {
     override def ts: Long = 0L
   }
 
+  class StringTestEvent(val str: String) extends Event {
+    override def ts: Long = 0L
+  }
+
   "A State" should "create a simple counter" in {
     val s = new State[ScoringContext]
     val update = defUpdate {
@@ -89,5 +93,50 @@ class StateSpec extends FlatSpec {
     assert(s.contains((4L,0L)) ===	true)
     assert(s.contains((4L,1L)) ===	false)
     assert((0 to 6 map(x => s.contains(x))) === Array(true, true, true, false, true, false, false))
+  }
+
+  it should "create a simple StringPrefixCounter" in {
+    val st = new State[ScoringContext]
+    val spc = st.stringPrefixCounter(defUpdate {
+      case e: StringTestEvent => e.str
+    })
+
+    for (i <- 1 to 10) {
+      val te = new StringTestEvent(((i*i) % 7).toString)
+      spc.increment(te)
+    }
+    assert(spc() === 10)
+    assert((0 to 6 map(x => spc(x.toString))) === Array(1,3,3,0,3,0, 0))
+  }
+
+  it should "create a StringPrefixCounter" in {
+    val st = new State[ScoringContext]
+    val spc = st.stringPrefixCounter(defUpdate {
+      case e: StringTestEvent => e.str
+    })
+    val words = Array("coze","cozen","cozenage","cozener","cozening",
+      "cozeningly","cozier","cozily","coziness","cozy",
+      "crab","crabbed","crabbedly","crabbedness","crabber",
+      "crabbery","crabbing","crabby", "crabcatcher","crabeater",
+      "craber")
+    var i = 0
+    for (word <- words) {
+      val te = new StringTestEvent(word)
+      for (j <- 0 until ((i % 5) + 1)) {
+        spc.increment(te)
+      }
+      i += 1
+    }
+    assert(spc() === 61)
+    val r1 = spc.prefixSearch("coz")
+    assert(r1.size === 10)
+    assert(r1.find(_==("cozenage",3)).size === 1)
+
+    assert(spc.prefixSearch("cozef").size === 0)
+    assert(spc.prefixSearch("a").size === 0)
+
+    val r2 = spc.prefixSearch("crabb").toArray
+    assert(r2.size === 7)
+    assert(r2.map(_._2).sum === 20)
   }
 }
