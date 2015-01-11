@@ -33,14 +33,14 @@ object PredictBuild extends Build {
     )
   )
 
-  lazy val demo = Project("demo", file("demo"),
+  lazy val demo = Project("demo-best-buy", file("demo-best-buy"),
     settings = buildSettings ++ Seq (
       name := "demo"
     )
   ) dependsOn(antelope)
 
   val ScalatraVersion = "2.3.0"
-  lazy val demoweb = Project ("antelope-best-buy-demo", file("antelope-best-buy-demo"),
+  lazy val demoweb = Project ("demo-best-buy-web", file("demo-best-buy-web"),
     settings = buildSettings ++ ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ Seq(
       name := "Antelope Best Buy Demo",
       resolvers += Classpaths.typesafeReleases,
