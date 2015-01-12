@@ -12,9 +12,12 @@ import scala.util.Random
  * for the model specified in [[ModelEventProcessor]]
  */
 object LearnedRankerTraining extends App with EventProcessing {
+  final val TRAINING_START = 10000
+  final val TRAINING_LIMIT = 30000
+
   // Use only a portion of the data set so that we can use
   // the later time period for model evaluation
-  override def productViewLimit(): Int = 30000
+  override def productViewLimit(): Int = TRAINING_LIMIT
 
   override protected def getEventProcessor() = new ModelEventProcessor() {
     var trainingWriter: MultiFormatWriter = null
@@ -46,7 +49,7 @@ object LearnedRankerTraining extends App with EventProcessing {
           }
 
             viewCt += 1
-            if (viewCt > 10000) {
+            if (viewCt > TRAINING_START) {
               // Generate training data
               printTrainingResult(pv.skuSelected, true)
               val randomDoc = getRandomDoc()
