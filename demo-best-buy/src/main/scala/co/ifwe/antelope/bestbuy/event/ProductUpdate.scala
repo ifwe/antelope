@@ -1,7 +1,7 @@
 package co.ifwe.antelope.bestbuy.event
 
 import co.ifwe.antelope.bestbuy.Product
-import co.ifwe.antelope.{util, Event}
+import co.ifwe.antelope.{Event, util}
 
 /**
  * Event-based representation of Best Buy product catalog

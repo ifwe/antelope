@@ -6,11 +6,8 @@ import java.text.SimpleDateFormat
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
-
 import org.json4s.{DefaultFormats, Formats}
-
 import org.scalatra.json._
-
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -44,8 +41,8 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
     progressPrintInterval = 500) with Suggestions {
 
     val suggestModel = new Model[ProductSearchScoringContext] with Suggestions {
+      import co.ifwe.antelope.Text.normalize
       import s._
-      import Text.normalize
       val queryPopularityCounter = stringPrefixCounter(defUpdate {
         case pv: ProductView => normalize(pv.query)
       })

@@ -1,6 +1,7 @@
+import javax.servlet.ServletContext
+
 import co.ifwe.antelope.bestbuy._
 import org.scalatra._
-import javax.servlet.ServletContext
 
 class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {

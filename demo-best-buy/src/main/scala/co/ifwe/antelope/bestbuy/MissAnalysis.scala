@@ -1,8 +1,8 @@
 package co.ifwe.antelope.bestbuy
 
+import co.ifwe.antelope.Text._
 import co.ifwe.antelope._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
-import co.ifwe.antelope.Text._
 
 import scala.collection.mutable
 import scala.util.Random

@@ -3,8 +3,8 @@ package co.ifwe.antelope.bestbuy.model
 import co.ifwe.antelope.ProductSearchScoringContext
 import co.ifwe.antelope.Text.StringToTerms
 import co.ifwe.antelope.UpdateDefinition.defVectorUpdate
-import co.ifwe.antelope.feature.Terms
 import co.ifwe.antelope.bestbuy.event.ProductView
+import co.ifwe.antelope.feature.Terms
 
 
 /**

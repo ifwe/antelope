@@ -1,8 +1,8 @@
 package co.ifwe.antelope.bestbuy.exec
 
 import co.ifwe.antelope.bestbuy.EventProcessing
-import co.ifwe.antelope.{Event, EventProcessor}
 import co.ifwe.antelope.bestbuy.event._
+import co.ifwe.antelope.{Event, EventProcessor}
 
 /**
  * Demo functionality, just show a few events so that we can see what they look like

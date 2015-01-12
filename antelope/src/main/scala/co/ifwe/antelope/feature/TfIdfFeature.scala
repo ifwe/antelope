@@ -1,7 +1,7 @@
 package co.ifwe.antelope.feature
 
-import co.ifwe.antelope.util._
 import co.ifwe.antelope._
+import co.ifwe.antelope.util._
 
 /**
  * Basic implementation of Tf-Idf, here as in Lucene.

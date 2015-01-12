@@ -1,6 +1,6 @@
 package co.ifwe.antelope.feature
 
-import co.ifwe.antelope.{ProductSearchScoringContext, IterableUpdateDefinition}
+import co.ifwe.antelope.{IterableUpdateDefinition, ProductSearchScoringContext}
 
 /**
  * Container for encapsulating ability to extract text terms, both from updates as
