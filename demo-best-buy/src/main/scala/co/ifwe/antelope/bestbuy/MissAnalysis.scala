@@ -15,8 +15,8 @@ class MissAnalysis {
   private var spellingPrintCt = 0
   private var nonSpellingPrintCt = 0
 
-  private val spellingPrintCtMax = 0
-  private val nonSpellingPrintCtMax = 25
+  private val spellingPrintCtMax = 25
+  private val nonSpellingPrintCtMax = 0
 
   private val products = mutable.HashMap[Long,ProductUpdate]()
   val s = new State[ProductSearchScoringContext]
