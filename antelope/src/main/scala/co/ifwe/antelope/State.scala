@@ -161,7 +161,7 @@ class State[T <: ScoringContext] {
       }
 
       override def prefixSearch(prefix: String): Iterable[(String, Long)] = {
-        import collection.JavaConversions._
+        import scala.collection.JavaConversions._
         for (e: java.util.Map.Entry[String, Long] <- m.subMap(prefix, incLastChar(prefix)).entrySet()) yield {
           e.getKey -> e.getValue
         }

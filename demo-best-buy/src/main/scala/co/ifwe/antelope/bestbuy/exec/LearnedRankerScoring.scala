@@ -1,8 +1,8 @@
 package co.ifwe.antelope.bestbuy.exec
 
-import co.ifwe.antelope.bestbuy.{MissAnalysis, EventProcessing, RecommendationStats, ModelEventProcessor}
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
+import co.ifwe.antelope.bestbuy.{EventProcessing, MissAnalysis, ModelEventProcessor, RecommendationStats}
 
 /**
  * Score a some of the documents based on training data - run this

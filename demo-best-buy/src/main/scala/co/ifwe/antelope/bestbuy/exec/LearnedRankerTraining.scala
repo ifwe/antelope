@@ -1,9 +1,9 @@
 package co.ifwe.antelope.bestbuy.exec
 
 import co.ifwe.antelope._
+import co.ifwe.antelope.bestbuy.event.ProductView
 import co.ifwe.antelope.bestbuy.{BestBuyScoringContext, EventProcessing, ModelEventProcessor}
 import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter, VowpalTrainingFormatter}
-import co.ifwe.antelope.bestbuy.event.ProductView
 
 import scala.util.Random
 

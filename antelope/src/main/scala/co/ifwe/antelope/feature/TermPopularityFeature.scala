@@ -1,7 +1,7 @@
 package co.ifwe.antelope.feature
 
 import co.ifwe.antelope._
-import util._
+import co.ifwe.antelope.util._
 
 class TermPopularityFeature[T <: ProductSearchScoringContext](ide: IdExtractor, t: Terms)(implicit val s: State[T])
   extends Feature[ProductSearchScoringContext] {

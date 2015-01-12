@@ -3,8 +3,8 @@ package co.ifwe.antelope.bestbuy.model
 import co.ifwe.antelope.Text._
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope._
-import co.ifwe.antelope.feature._
 import co.ifwe.antelope.bestbuy.event._
+import co.ifwe.antelope.feature._
 
 /**
  * A simple model implemented for the

@@ -1,6 +1,6 @@
 package co.ifwe.antelope.bestbuy.event
 
-import co.ifwe.antelope.{HasQuery, Event, util}
+import co.ifwe.antelope.{Event, HasQuery, util}
 
 /**
  * Event-based representation of Best Buy user activity as from the
