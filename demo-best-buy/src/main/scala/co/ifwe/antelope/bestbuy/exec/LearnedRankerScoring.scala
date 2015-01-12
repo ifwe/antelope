@@ -17,7 +17,7 @@ object LearnedRankerScoring extends App with EventProcessing {
     new ModelEventProcessor(
 //        TODO - separate this for purpose of simple demo
 //        weights = Array(87.48098,3013.327,0.1203471,4506.025,-0.02656143),
-        weights = Array(88.95288,2205.573,0.1132812,4146.975,-0.01831237,1.34746,0.06652026),
+        weights = Array(89.24148,2222.281,0.1103307,4159.622,-0.0142663,1.403137,0.0668691),
         progressPrintInterval = 500) {
       var viewCt = 0
 
@@ -26,7 +26,7 @@ object LearnedRankerScoring extends App with EventProcessing {
           case pv: ProductView =>
             viewCt += 1
             if (viewCt > 30000) {
-              val td = topDocs(pv.query, 5)
+              val td = topDocs(pv.query, 5).topDocs
               val hit = rs.record(pv.skuSelected, td)
               if (!hit) {
                 ma.miss(pv, td)

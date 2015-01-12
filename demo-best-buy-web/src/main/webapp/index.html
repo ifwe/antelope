@@ -13,6 +13,8 @@
             function formController($scope, $http) {
                 $scope.formData = {};
                 $scope.showProductDetail = false;
+                $scope.rewriteMessage = { };
+                $scope.rewriteMessage.showMessage = false;
 
                 $scope.processForm = function() {
                     console.log("query for " + $scope.formData);
@@ -31,6 +33,13 @@
                         } else {
                           // console.log("success!!");
                           // if successful, bind success message to message
+                          if (data.inferredQuery != null) {
+                              $scope.rewriteMessage.rewrite = data.inferredQuery;
+                              $scope.rewriteMessage.showMessage = true;
+                          } else {
+                              $scope.rewriteMessage.rewrite = "XXX";
+                              $scope.rewriteMessage.showMessage = false;
+                          }
                           $scope.results = data.results;
                           $scope.showProductDetail = false;
                         }
@@ -80,6 +89,11 @@
             </form>
 
             <div><h2>Search Query Result</h2></div>
+            <div class="row rewriteMessage" ng-show="rewriteMessage.showMessage">
+                <div class="col-sm-6">
+                    Showing results for <b>{{ rewriteMessage.rewrite }}</b>
+                </div>
+            </div>
             <div class="row">
                 <div class="searchResults col-sm-6">
                     <div ng-repeat="(rn, res) in results">

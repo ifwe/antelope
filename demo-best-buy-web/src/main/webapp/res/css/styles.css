@@ -12,3 +12,7 @@
   font-weight: lighter;
   text-align: right;
 }
+.rewriteMessage {
+  padding: 10px;
+  color: #3399ff;
+}
