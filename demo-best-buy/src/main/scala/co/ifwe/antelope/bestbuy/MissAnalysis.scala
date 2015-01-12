@@ -5,14 +5,18 @@ import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
 import co.ifwe.antelope.Text._
 
 import scala.collection.mutable
+import scala.util.Random
 
 /**
  * Analysis of bad predictions
  */
 class MissAnalysis {
   private var missCt = 0
-  private var printCt = 0
-  private val printCtMax = 25
+  private var spellingPrintCt = 0
+  private var nonSpellingPrintCt = 0
+
+  private val spellingPrintCtMax = 0
+  private val nonSpellingPrintCtMax = 25
 
   private val products = mutable.HashMap[Long,ProductUpdate]()
   val s = new State[ProductSearchScoringContext]
@@ -99,7 +103,7 @@ class MissAnalysis {
 
     if (spellingCorrections.find(_.size > 0).isDefined) {
       correctionCounts(spellingCorrections.indexWhere(_.size > 0)) += 1
-      if (printCt < printCtMax) {
+      if (spellingPrintCt < spellingPrintCtMax) {
         spellingStats.map(_._1).zip(spellingCorrections).foreach {
           case (desc, corrections) =>
             println(s"""$desc: ${corrections.mkString(",")}""")
@@ -109,7 +113,17 @@ class MissAnalysis {
          |selection: ${getTitle(pv.skuSelected)}
          |results: ${results.map(getTitle).mkString("\n         ")}
          """.stripMargin)
-        printCt += 1
+        spellingPrintCt += 1
+      }
+    } else {
+      if (nonSpellingPrintCt < nonSpellingPrintCtMax && Random.nextDouble() < 0.1) {
+        println(
+          s"""Non-spelling miss
+         |query: "${pv.query}"
+         |selection: ${getTitle(pv.skuSelected)}
+         |results: ${results.map(getTitle).mkString("\n         ")}
+         """.stripMargin)
+        nonSpellingPrintCt += 1
       }
     }
     missCt += 1
