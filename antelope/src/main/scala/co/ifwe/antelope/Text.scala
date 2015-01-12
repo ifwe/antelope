@@ -12,6 +12,7 @@ object Text {
   def normalize(s: String): String = extraSpacesRegex.replaceAllIn(cleanRegex.replaceAllIn(s.toLowerCase," ").trim," ")
   def termsExtract(s: String): Iterable[String] = normalize(s).split(" ")
   def bigramsExtract(s: String): Iterable[String] = termsExtract(s).sliding(2).map(_.mkString(" ")).toIterable
+  def joinedBigramsExtract(s: String): Iterable[String] = termsExtract(s).sliding(2).map(_.mkString("")).toIterable
 
   val terms: StringToTerms = (s: String) => termsExtract(s)
   val bigrams: StringToTerms = (s: String) => bigramsExtract(s)

@@ -46,9 +46,32 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
     feature(new TfIdfFeature(catalogSku, new TermsProductUpdate(te)))
   }
 
-//  feature(new Feature[ProductSearchScoringContext] {
-//    override def score(implicit ctx: ProductSearchScoringContext): (Long) => Double = {
-//
-//    }
-//  })
+  feature(new TfIdfFeature(catalogSku, new Terms {
+    override val termsFromUpdate: IterableUpdateDefinition[String] =  {
+      new IterableUpdateDefinition[String] {
+        override def getFunction: PartialFunction[Event, Iterable[String]] = {
+          case pu: ProductUpdate =>
+            Text.joinedBigramsExtract(pu.name)
+        }
+      }
+    }
+    override val termsFromQueryContext: (ProductSearchScoringContext) => Iterable[String] = {
+      ctx => Text.termsExtract(ctx.query)
+    }
+  }))
+
+  feature(new TfIdfFeature(catalogSku, new Terms {
+    override val termsFromUpdate: IterableUpdateDefinition[String] =  {
+      new IterableUpdateDefinition[String] {
+        override def getFunction: PartialFunction[Event, Iterable[String]] = {
+          case pu: ProductUpdate =>
+            Text.termsExtract(pu.name)
+        }
+      }
+    }
+    override val termsFromQueryContext: (ProductSearchScoringContext) => Iterable[String] = {
+      ctx => Text.joinedBigramsExtract(ctx.query)
+    }
+  }))
+
 }
