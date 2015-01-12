@@ -1,5 +1,6 @@
 package co.ifwe.antelope.bestbuy
 
+import co.ifwe.antelope.Spelling._
 import co.ifwe.antelope.Text._
 import co.ifwe.antelope._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
@@ -46,33 +47,6 @@ class MissAnalysis {
     }).toList
   }
 
-  def extraLetterPermutations(s: String): Iterable[String] = {
-    (0 until s.length).map(s.splitAt(_)).map(x=>x._1 + x._2.tail)
-  }
-
-  def missingLetterPermutations(s: String): Iterable[String] = {
-    (0 to s.length).map(s.splitAt(_)).flatMap{ case (h, t) =>
-      ('a' to 'z').map(h + _ + t)
-    }
-  }
-
-  def changeLetterPermutations(s: String): Iterable[String] = {
-    (0 until s.length).flatMap { ind: Int =>
-      val c = s.charAt(ind)
-      val prefix = s.substring(0, ind)
-      val suffix = s.substring(ind + 1, s.length)
-      ('a' to 'z').filter(_ != c).map(prefix + _ + suffix)
-    }
-  }
-
-  def transposeLetterPermutations(s: String): Iterable[String] = {
-    (0 until (s.length - 1)).map { ind =>
-      val prefix = s.substring(0, ind)
-      val suffix = s.substring(ind + 2, s.length)
-      prefix + s.charAt(ind + 1) + s.charAt(ind) + suffix
-    }
-  }
-
   def spaceSearch(t: Iterable[String], u: Iterable[String]) = {
     val tgt = mutable.HashSet[String]() ++ u
     (if (t.size > 1) {
@@ -82,13 +56,12 @@ class MissAnalysis {
     }).toList
   }
 
-
   val spellingStats: Array[(String,(Iterable[String], Iterable[String]) => Iterable[(String,String)])] = Array(
     ("extra space", spaceSearch(_,_)),
     ("missingSpace", (x: Iterable[String], y:Iterable[String]) => spaceSearch(y, x)),
-    ("extraLetters", analyzeSpelling(_, _, extraLetterPermutations)),
-    ("missingLetters", analyzeSpelling(_, _, missingLetterPermutations)),
-    ("changeLetters", analyzeSpelling(_, _, changeLetterPermutations)),
+    ("extraLetters", analyzeSpelling(_, _, removeLetterPermutations)),
+    ("missingLetters", analyzeSpelling(_, _, addLetterPermutations)),
+    ("changeLetters", analyzeSpelling(_, _, modifyLetterPermutations)),
     ("transposeLetters", analyzeSpelling(_, _, transposeLetterPermutations))
   )
 

@@ -85,11 +85,14 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
   case class Results(success: Boolean, data: Array[Long])
   case class ProductDescription(sku: Long, title: String)
   case class ProductDetailedDescription(sku: Long, title: String, description: String)
-  case class ResultsWithTitles(success: Boolean, results: Array[ProductDescription])
+  case class ResultsWithTitles(success: Boolean, results: Array[ProductDescription],
+                                inferredQuery: String)
 
-  private def buildResults(results: Array[Long]) : ResultsWithTitles = {
+  private def buildResults(results: TopDocsResult) : ResultsWithTitles = {
     new ResultsWithTitles(success = true,
-      results = results.map(sku => ProductDescription(sku, catalog(sku).name)))
+      results = results.topDocs.map(sku => ProductDescription(sku, catalog(sku).name)),
+      inferredQuery = if (results.inferredQuery.isDefined) results.inferredQuery.get else null
+    )
   }
 
   before() {

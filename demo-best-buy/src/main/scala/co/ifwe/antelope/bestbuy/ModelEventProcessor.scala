@@ -15,12 +15,15 @@ import scala.collection.mutable
  */
 abstract class ModelEventProcessor(weights: Array[Double] = null, progressPrintInterval: Int = 5000) extends EventProcessor {
   val m = new BestBuyModel
+  val sm = new SpellingModel
   val allDocs = mutable.HashSet[Long]()
   private val progressMeter = new ProgressMeter(progressPrintInterval)
 
-  def topDocs(query: String, n: Int): Array[Long] = {
+  def topDocs(query: String, n: Int): TopDocsResult = {
     val docs = allDocs.toArray
-    (docs zip m.score(new BestBuyScoringContext(query), docs, weights)).sortBy(-_._2).take(n).map(_._1)
+    val scoringContext = new BestBuyScoringContext(query, sm)
+    val topDocs = (docs zip m.score(scoringContext, docs, weights)).sortBy(-_._2).take(n).map(_._1)
+    new TopDocsResult(query, scoringContext.correction, topDocs, n)
   }
 
   override protected def consume(e: Event) = {
@@ -41,6 +44,7 @@ abstract class ModelEventProcessor(weights: Array[Double] = null, progressPrintI
       case _ =>
     }
     if (!skipUpdate) {
+      sm.update(e)
       m.update(e)
     }
   }
