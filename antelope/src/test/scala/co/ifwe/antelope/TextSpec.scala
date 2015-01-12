@@ -35,4 +35,19 @@ class TextSpec extends FlatSpec {
   it should "extract bigrams" in {
     assert(T.bigramsExtract(input) === Array("kinect sports", "sports xbox", "xbox 360"))
   }
+
+  it should "convert acronyms to single words" in {
+    assert(T.normalize("F.E.A.R. 3 - Xbox 360") === "fear 3 xbox 360")
+    assert(T.normalize("L.A. Noire: Complete Edition - Xbox 360") ===
+      "la noire complete edition xbox 360")
+    assert(T.normalize("L.A. Noire has an acronym. And another sentence.") ===
+     "la noire has an acronym and another sentence")
+  }
+
+  it should "drop apostrophes" in {
+    assert(T.normalize("Assassin's Creed: Revelations - Xbox 360") ===
+      "assassins creed revelations xbox 360")
+    assert(T.normalize("You'll enjoy an award-winning trilogy") ===
+      "youll enjoy an award winning trilogy")
+  }
 }

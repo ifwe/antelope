@@ -17,7 +17,7 @@ object LearnedRankerScoring extends App with EventProcessing {
     new ModelEventProcessor(
 //        TODO - separate this for purpose of simple demo
 //        weights = Array(87.48098,3013.327,0.1203471,4506.025,-0.02656143),
-        weights = Array(88.41558,2320.211,0.1147869,4253.672,-0.02023937,1.333892,0.06304935),
+        weights = Array(88.95288,2205.573,0.1132812,4146.975,-0.01831237,1.34746,0.06652026),
         progressPrintInterval = 500) {
       var viewCt = 0
 
