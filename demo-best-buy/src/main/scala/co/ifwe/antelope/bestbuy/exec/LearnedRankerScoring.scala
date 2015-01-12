@@ -2,6 +2,7 @@ package co.ifwe.antelope.bestbuy.exec
 
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
+import co.ifwe.antelope.bestbuy.exec.LearnedRankerTraining.TRAINING_LIMIT
 import co.ifwe.antelope.bestbuy.{EventProcessing, MissAnalysis, ModelEventProcessor, RecommendationStats}
 
 /**
@@ -25,7 +26,7 @@ object LearnedRankerScoring extends App with EventProcessing {
         e match {
           case pv: ProductView =>
             viewCt += 1
-            if (viewCt > 30000) {
+            if (viewCt > TRAINING_LIMIT) {
               val td = topDocs(pv.query, 5).topDocs
               val hit = rs.record(pv.skuSelected, td)
               if (!hit) {
