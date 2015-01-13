@@ -8,7 +8,7 @@ import sbt._
 object BuildSettings {
   val buildSettings = Defaults.coreDefaultSettings ++ Seq(
     organization := "co.ifwe",
-    version := "0.1.0-SNAPSHOT",
+    version := "0.2.0-SNAPSHOT",
     scalaVersion := "2.10.4",
     scalacOptions ++= Seq("-deprecation", "-feature", "-language:implicitConversions")
   )
