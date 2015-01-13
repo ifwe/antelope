@@ -49,8 +49,13 @@ trait EventProcessing {
         case e: java.text.ParseException => backupDf.parse(timeStr).getTime
       }
     }
+
+    def getUser(userStr: String): Long = {
+      java.lang.Long.parseUnsignedLong(userStr.substring(0, 16), 16) & 0x7fffffffffffffffL
+    }
+
     ep.process(EventSource.fromFile(viewsFn).map(e =>
-      new ProductView(getTime(e("click_time")), e("query"), e("sku").toLong)),
+      new ProductView(getTime(e("click_time")), getTime(e("query_time")), getUser(e("user")), e("query"), e("sku").toLong)),
       productViewLimit())
     ep.finish()
   } finally {
