@@ -18,7 +18,8 @@ object ProductsReader {
       val sku = (x \ "sku" text)
       val name = (x \ "name" text)
       val description = (x \ "longDescription" text)
-      new Product(sku.toLong, name, description)
+      val categories = (x \\ "category" \ "name").map(_.text).toArray
+      new Product(sku.toLong, name, description, categories)
     }
   }
 

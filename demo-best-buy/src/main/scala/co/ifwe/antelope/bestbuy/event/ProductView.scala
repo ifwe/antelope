@@ -9,8 +9,8 @@ import co.ifwe.antelope.{Event, HasQuery, util}
  * @param query
  * @param skuSelected
  */
-case class ProductView(ts: Long, query: String, skuSelected: Long) extends Event with HasQuery {
+case class ProductView(ts: Long, queryTs: Long, user: Long, query: String, skuSelected: Long) extends Event with HasQuery {
   override def toString() = {
-    s"${util.formatTimestamp(ts)}:$query->$skuSelected"
+    s"${util.formatTimestamp(ts)} | $query->$skuSelected | query delay: ${(ts - queryTs)/1000}s, user: ${user}"
   }
 }

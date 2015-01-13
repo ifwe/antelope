@@ -21,6 +21,7 @@ class State[T <: ScoringContext] {
 
   trait Counter1[T1] extends Counter {
     def apply(k: T1): Long
+    def toMap: Map[T1, Long]
   }
 
   trait Counter2[T1,T2] extends Counter {
@@ -52,10 +53,27 @@ class State[T <: ScoringContext] {
     def size(k: T1): Long
     def contains(k: T1): Boolean
     def contains(k: (T1, T2)): Boolean
+    def toSet: scala.collection.Set[(T1,T2)]
+    def mapSize(): Map[T1, Long]
+  }
+
+  trait Sum {
+    def add: PartialFunction[Event, Unit]
+    def apply(): Long
+  }
+
+  trait Sum0 extends Sum {
+    def apply(): Long
+  }
+
+  trait Sum1[T1] extends Sum {
+    def apply(k: T1): Long
+    def toMap: Map[T1, Long]
   }
 
   val counters = mutable.ArrayBuffer[Counter]()
   val sets = mutable.ArrayBuffer[Set]()
+  val sums = mutable.ArrayBuffer[Sum]()
   val features = mutable.ArrayBuffer[Feature[T]]()
 
   def registerCounter[T <: Counter](c: T): T = {
@@ -68,8 +86,17 @@ class State[T <: ScoringContext] {
     s
   }
 
+  def registerSum[T <: Sum](s: T): T = {
+    sums += s
+    s
+  }
+
   def incr[T](m: mutable.HashMap[T,Long], k: T): Unit = {
     m.put(k, m.getOrElse(k, 0L) + 1)
+  }
+
+  def incr[T](m: mutable.HashMap[T,Long], k: T, delta: Int): Unit = {
+    m.put(k, m.getOrElse(k, 0L) + delta)
   }
 
   def counter[T1](d: IterableUpdateDefinition[T1]): Counter1[T1] = {
@@ -90,6 +117,8 @@ class State[T <: ScoringContext] {
       }
 
       override def apply(): Long = totalCt
+
+      override def toMap(): Map[T1, Long] = m.toMap
 
       override def toString(): String = {
         m.toString()
@@ -228,8 +257,53 @@ class State[T <: ScoringContext] {
         }
       }
 
+      override def toSet(): scala.collection.Set[(T1, T2)] = s.toSet
+
+      override def mapSize(): Map[T1, Long] = m.toMap
+
       override def toString(): String = {
         s.toString()
+      }
+    })
+  }
+
+  def sum(d: IterableUpdateDefinition[Int]): Sum0 = {
+    registerSum(new Sum0 {
+      val f = d.getFunction
+      var sum = 0L
+      override def apply(): Long = sum
+
+      override def add: PartialFunction[Event, Unit] = f andThen (x => x.foreach {
+        case (delta) => {
+          sum += delta
+        }
+      })
+    })
+  }
+
+  def sum[T1](d: IterableUpdateDefinition[(T1, Int)]): Sum1[T1] = {
+    registerSum(new Sum1[T1] {
+      val f = d.getFunction
+      val m = mutable.HashMap[T1, Long]()
+      var totalCt = 0L
+
+      override def add(): PartialFunction[Event, Unit] = f andThen (x => x.foreach {
+        case (k, delta) => {
+          incr(m, k, delta)
+          totalCt += delta
+        }
+      })
+
+      override def apply(k: T1): Long = {
+        m.getOrElse(k, 0L)
+      }
+
+      override def apply(): Long = totalCt
+
+      override def toMap(): Map[T1, Long] = m.toMap
+
+      override def toString(): String = {
+        m.toString()
       }
     })
   }
@@ -243,6 +317,9 @@ class State[T <: ScoringContext] {
       (c.increment orElse defUpdate{ case _ => }.getFunction)(e)
     }
     for (e <- events; s <- sets) {
+      (s.add orElse defUpdate{ case _ => }.getFunction)(e)
+    }
+    for (e <- events; s <- sums) {
       (s.add orElse defUpdate{ case _ => }.getFunction)(e)
     }
   }

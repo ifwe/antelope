@@ -11,8 +11,8 @@ import co.ifwe.antelope.{Event, util}
  * @param name product name (game title)
  * @param description (product description text)
  */
-class ProductUpdate(val ts: Long, sku: Long, name: String, description: String)
-  extends Product(sku, name, description) with Event {
+class ProductUpdate(val ts: Long, sku: Long, name: String, description: String, categories: Array[String])
+  extends Product(sku, name, description, categories) with Event {
   protected def shortDesc: String = {
     if (description.length > 40) {
       description.substring(0,37) + "..."
@@ -21,13 +21,13 @@ class ProductUpdate(val ts: Long, sku: Long, name: String, description: String)
     }
   }
   override def toString: String= {
-    s"${util.formatTimestamp(ts)}:$sku:$name:${shortDesc}"
+    s"${util.formatTimestamp(ts)}:$sku:$name:${categories.mkString(",")}:${shortDesc}"
   }
 }
 
 object ProductUpdate {
   def apply(ts: Long, product: Product) = {
-    new ProductUpdate(ts, product.sku, product.name, product.description)
+    new ProductUpdate(ts, product.sku, product.name, product.description, product.categories)
   }
 }
 
