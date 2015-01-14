@@ -7,7 +7,7 @@ class SpellingModelSpec extends FlatSpec {
   "A SpellingModel" should "make simple spelling corrections" in {
     val sm = new SpellingModel
     def addTitle(name: String): Unit = {
-      sm.update(new ProductUpdate(0L, 0L, name, ""))
+      sm.update(new ProductUpdate(0L, 0L, name, "", Array()))
     }
     addTitle("Forza Motorsport 4")
     addTitle("Dead Island")
