@@ -26,7 +26,7 @@ trait EventProcessing {
     throw new IllegalArgumentException("must set $ANTELOPE_TRAINING environment variable")
   }
 
-  val viewsFn = dataDir + File.separator + "train.csv"
+  val viewsFn = dataDir + File.separator + "train_sorted.csv"
   val productsFn = dataDir + File.separator + "small_product_data.xml"
 
   protected def getTrainingFile(name: String) = trainingDir + File.separator + name
