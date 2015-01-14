@@ -19,9 +19,9 @@ abstract class ModelEventProcessor(weights: Array[Double] = null, progressPrintI
   val allDocs = mutable.HashSet[Long]()
   private val progressMeter = new ProgressMeter(progressPrintInterval)
 
-  def topDocs(query: String, n: Int): TopDocsResult = {
+  def topDocs(query: String, t: Long, n: Int): TopDocsResult = {
     val docs = allDocs.toArray
-    val scoringContext = new BestBuyScoringContext(query, sm)
+    val scoringContext = new BestBuyScoringContext(query, sm, t)
     val topDocs = (docs zip m.score(scoringContext, docs, weights)).sortBy(-_._2).take(n).map(_._1)
     new TopDocsResult(query, scoringContext.correction, topDocs, n)
   }
