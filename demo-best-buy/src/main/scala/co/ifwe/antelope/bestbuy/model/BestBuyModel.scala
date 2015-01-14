@@ -35,13 +35,6 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
     case pu: ProductUpdate => pu.sku
   }
 
-//  val spellCheck
-
-//  override def update: Unit = {
-//    def update(e: Event): Unit = {
-//
-//    }
-//  }
 
   val hourInMilliseconds = 60 * 60 * 1000
   val dayInMilliseconds = 24 * hourInMilliseconds
@@ -50,7 +43,6 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
   feature(new RecentPopularityFeature(skuAndTime, dayInMilliseconds))
   feature(new RecentPopularityFeature(skuAndTime, 3 * dayInMilliseconds))
   feature(new RecentPopularityFeature(skuAndTime, 7 * dayInMilliseconds))
-//  for (te <- List(terms, bigrams, spellCheckedTerms)) {
   for (te <- List(terms, bigrams)) {
     feature(new TermPopularityFeature(skuSelected, new TermsFromText(te)))
     feature(new TfIdfFeature(catalogSku, new TermsProductUpdate(te)))
