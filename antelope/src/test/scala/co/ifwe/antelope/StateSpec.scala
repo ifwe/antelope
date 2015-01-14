@@ -5,13 +5,9 @@ import org.scalatest.FlatSpec
 
 class StateSpec extends FlatSpec {
 
-  class TestEvent(val id: Long) extends Event {
-    override def ts: Long = 0L
-  }
+  class TestEvent(val id: Long, val ts: Long = 0L) extends Event
 
-  class StringTestEvent(val str: String) extends Event {
-    override def ts: Long = 0L
-  }
+  class StringTestEvent(val str: String, val ts: Long = 0L) extends Event
 
   "A State" should "create a simple counter" in {
     val s = new State[ScoringContext]
@@ -138,5 +134,22 @@ class StateSpec extends FlatSpec {
     val r2 = spc.prefixSearch("crabb").toArray
     assert(r2.size === 7)
     assert(r2.map(_._2).sum === 20)
+  }
+
+  it should "create a simple smoothed counter" in {
+    val st = new State[ScoringContext]
+    val spc = st.smoothedCounter(defUpdate {
+      case e: TestEvent => (e.id, e.ts)
+    }, Math.log(2D)/1000D)
+
+    for (i <- 1 to 10) {
+      val te = new TestEvent(((i*i) % 7), i * 1000 + 5000)
+      spc.increment(te)
+    }
+
+    def trunc(d: Double) = Math.floor(d * 1e6) / 1e6
+    assert(spc(15000) === 1.998046875D)
+    assert(trunc(spc(18000)) === 0.249755D)
+    assert((0 to 6 map(x => trunc(spc(18000,x)))) === Array(0.015624D, 0.039306D, 0.127929D, 0D, 0.066894D, 0D, 0D))
   }
 }

@@ -27,6 +27,10 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
     case pv: ProductView => pv.skuSelected
   }
 
+  val skuAndTime = defUpdate {
+    case pv: ProductView => (pv.skuSelected, pv.ts)
+  }
+
   val catalogSku = defUpdate {
     case pu: ProductUpdate => pu.sku
   }
@@ -39,7 +43,13 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
 //    }
 //  }
 
+  val hourInMilliseconds = 60 * 60 * 1000
+  val dayInMilliseconds = 24 * hourInMilliseconds
   feature(new OverallPopularityFeature(skuSelected))
+  feature(new RecentPopularityFeature(skuAndTime, hourInMilliseconds))
+  feature(new RecentPopularityFeature(skuAndTime, dayInMilliseconds))
+  feature(new RecentPopularityFeature(skuAndTime, 3 * dayInMilliseconds))
+  feature(new RecentPopularityFeature(skuAndTime, 7 * dayInMilliseconds))
 //  for (te <- List(terms, bigrams, spellCheckedTerms)) {
   for (te <- List(terms, bigrams)) {
     feature(new TermPopularityFeature(skuSelected, new TermsFromText(te)))

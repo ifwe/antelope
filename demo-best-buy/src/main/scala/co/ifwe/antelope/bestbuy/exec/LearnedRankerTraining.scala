@@ -44,7 +44,7 @@ object LearnedRankerTraining extends App with EventProcessing {
       e match {
         case pv: ProductView =>
           def printTrainingResult(docId: Long, outcome: Boolean): Unit = {
-            val ctx = new BestBuyScoringContext(pv.query, sm)
+            val ctx = new BestBuyScoringContext(pv.query, sm, pv.ts)
             trainingWriter.write(new TrainingExample(outcome, m.featureNames zip m.featureValues(ctx, docId)))
           }
 

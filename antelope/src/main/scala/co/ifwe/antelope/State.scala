@@ -72,9 +72,20 @@ class State[T <: ScoringContext] {
     def toMap: Map[T1, Long]
   }
 
+  trait SmoothedCounter {
+    def increment: PartialFunction[Event, Unit]
+    def apply(t: Long): Double
+  }
+
+  trait SmoothedCounter1[T1] extends SmoothedCounter {
+    def apply(t: Long, k: T1): Double
+    def toMap(t: Long): Map[T1, Double]
+  }
+
   val counters = mutable.ArrayBuffer[Counter]()
   val sets = mutable.ArrayBuffer[Set]()
   val sums = mutable.ArrayBuffer[Sum]()
+  val smoothedCounters = mutable.ArrayBuffer[SmoothedCounter]()
   val features = mutable.ArrayBuffer[Feature[T]]()
 
   def registerCounter[T <: Counter](c: T): T = {
@@ -89,6 +100,11 @@ class State[T <: ScoringContext] {
 
   def registerSum[T <: Sum](s: T): T = {
     sums += s
+    s
+  }
+
+  def registerSmoothedCounter[T <: SmoothedCounter](s: T): T = {
+    smoothedCounters += s
     s
   }
 
@@ -272,6 +288,68 @@ class State[T <: ScoringContext] {
     })
   }
 
+  def smoothedCounter[T1](d: IterableUpdateDefinition[(T1,Long)], smoothing: Double): SmoothedCounter1[T1] = {
+    registerSmoothedCounter(new SmoothedCounter1[T1] {
+      class ExpCt {
+        var lastT: Long = 0L
+        var sum: Double = 0D
+        def apply(t: Long): Double = {
+          // TODO this really shouldn't be happening, has to do with small sorting issues
+          if (t > lastT) {
+            sum * Math.exp(-smoothing * (t - lastT))
+          } else {
+            sum
+          }
+        }
+        def inc(t: Long): Unit = {
+          val delta = apply(t) + 1
+          if (delta.isInfinite && !sum.isInfinite) {
+            println("heading towards Inifinity at " + this + " inc " + t)
+          }
+
+          if (delta.isNaN && !sum.isNaN) {
+            println("heading towards NaN at " + this + " inc " + t)
+          }
+          sum = apply(t) + 1
+          lastT = t
+        }
+        override def toString(): String = {
+          s"$sum:$lastT"
+        }
+      }
+      val f = d.getFunction
+      val m = mutable.HashMap[T1, ExpCt]()
+      val totalCt = new ExpCt
+
+      override def increment() = f andThen (x => x.foreach {
+        case (k,t) => {
+          m.getOrElseUpdate(k, new ExpCt()).inc(t)
+          totalCt.inc(t)
+        }
+      })
+
+      override def apply(t: Long): Double = totalCt(t)
+
+      override def apply(t: Long, k: T1): Double = {
+//        println(m.get(k))
+        m.get(k) match {
+          case Some(ec) => ec(t)
+          case None => 0D
+        }
+      }
+
+      override def toMap(t: Long): Map[T1, Double] = {
+        m.mapValues(_(t)).toMap
+      }
+
+      override def toString(): String = {
+        m.toString() + "\n" + totalCt
+      }
+
+    })
+  }
+
+
   def sum(d: IterableUpdateDefinition[Int]): Sum0 = {
     registerSum(new Sum0 {
       val f = d.getFunction
@@ -326,6 +404,9 @@ class State[T <: ScoringContext] {
     }
     for (e <- events; s <- sums) {
       (s.add orElse defUpdate{ case _ => }.getFunction)(e)
+    }
+    for (e <- events; s <- smoothedCounters) {
+      (s.increment orElse defUpdate{ case _ => }.getFunction)(e)
     }
   }
 
