@@ -27,6 +27,7 @@ class State[T <: ScoringContext] {
   trait Counter2[T1,T2] extends Counter {
     def apply(k: (T1,T2)): Long
     def apply(k: T1): Long
+    def mapAt(k: T1): Map[T2, Long]
   }
 
   trait Counter3[T1,T2,T3] extends Counter {
@@ -159,6 +160,10 @@ class State[T <: ScoringContext] {
       }
 
       override def apply(): Long = totalCt
+
+      override def mapAt(k1: T1): Map[T2, Long] = {
+        m.filter(_._1._1 == k1).map({ case ((k1,k2),ct) => (k2,ct)}).toMap
+      }
 
       override def toString(): String = {
         m.toString()
