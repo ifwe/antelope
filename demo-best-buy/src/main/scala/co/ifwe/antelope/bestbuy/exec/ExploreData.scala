@@ -1,7 +1,7 @@
 package co.ifwe.antelope.bestbuy.exec
 
 import java.io.File
-import java.util.{Calendar, GregorianCalendar, TimeZone, Locale}
+import java.util.{Calendar, GregorianCalendar, TimeZone}
 
 import co.ifwe.antelope.bestbuy.event.{ProductView, ProductUpdate}
 import co.ifwe.antelope.{IterableUpdateDefinition, Event, EventProcessor, State}
@@ -23,15 +23,14 @@ object ExploreData extends App with EventProcessing {
       }
     }
 
-  def genIterableUpdateDefinitionIt[T](f: PartialFunction[Event, Iterable[T]]): IterableUpdateDefinition[T] = {
-    new IterableUpdateDefinition[T] {
-      override def getFunction: PartialFunction[Event, Iterable[T]] = new PartialFunction[Event, Iterable[T]] {
-        override def isDefinedAt(x: Event): Boolean = f.isDefinedAt(x)
-        override def apply(e: Event): Iterable[T] = f.apply(e)
+    def genIterableUpdateDefinitionIt[T](f: PartialFunction[Event, Iterable[T]]): IterableUpdateDefinition[T] = {
+      new IterableUpdateDefinition[T] {
+        override def getFunction: PartialFunction[Event, Iterable[T]] = new PartialFunction[Event, Iterable[T]] {
+          override def isDefinedAt(x: Event): Boolean = f.isDefinedAt(x)
+          override def apply(e: Event): Iterable[T] = f.apply(e)
+        }
       }
     }
-  }
-
 
   // Define an interface that is easier to read
   def counter[T](f: PartialFunction[Event, T]) = {
