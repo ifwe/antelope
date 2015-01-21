@@ -1,6 +1,6 @@
 package co.ifwe.antelope.bestbuy
 
-import java.io.File
+import java.io.{FilenameFilter, File}
 import java.net.URL
 
 import scala.language.postfixOps
@@ -12,7 +12,7 @@ import scala.xml.XML
  * [[https://www.kaggle.com/c/acm-sf-chapter-hackathon-small SF Bay Area ACM Data Mining Kaggle Competition]].
  */
 object ProductsReader {
-  def read(fn: URL): Traversable[Product] = {
+  def read(fn: URL): Iterable[Product] = {
     val catalog = XML.load(fn)
     for (x <- catalog \\ "product") yield {
       val sku = (x \ "sku" text)
@@ -23,7 +23,15 @@ object ProductsReader {
     }
   }
 
-  def fromFile(fn: String): Traversable[Product] = {
+  def fromFile(fn: String): Iterable[Product] = {
     read(new File(fn).toURI.toURL)
+  }
+
+  def fromDirectory(path: String): Iterable[Product] = {
+    (new File(path)).listFiles(new FilenameFilter {
+      override def accept(dir: File, name: String): Boolean = {
+        name.toLowerCase().endsWith(".xml")
+      }
+    }).toList.map(x => fromFile(x.getPath)).flatten
   }
 }

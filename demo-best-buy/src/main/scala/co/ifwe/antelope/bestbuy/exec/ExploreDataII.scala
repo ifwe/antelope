@@ -1,11 +1,11 @@
 package co.ifwe.antelope.bestbuy.exec
 
 import java.text.SimpleDateFormat
+import java.util.{Calendar, TimeZone, GregorianCalendar}
 
-import co.ifwe.antelope.bestbuy.event.{ProductViewStorage, ProductView}
+import co.ifwe.antelope.bestbuy.event.{Storage, ProductView}
 import co.ifwe.antelope.util.ProgressMeter
-import co.ifwe.antelope.{EventSource, Event, EventProcessor}
-import co.ifwe.antelope.bestbuy.EventProcessing
+import co.ifwe.antelope._
 
 object ExploreDataII extends App {
   // Set up event sources
@@ -36,12 +36,50 @@ object ExploreDataII extends App {
 //  val xx = EventSource.fromFile(viewsFn).view.map(e =>
 //    new ProductView(getTime(e("click_time")), getTime(e("query_time")), getUser(e("user")), e("query"), e("sku").toLong))
 //  ProductViewStorage.writeEvents(viewsFnBin, xx)
-  val xx = ProductViewStorage.readEvents(viewsFnBin)
-  xx .foreach { pv: ProductView => pm.increment() }
+  val xx = Storage.readEvents(viewsFnBin)
+
+  val s = new State
+  def genIterableUpdateDefinition[T](f: PartialFunction[Event, T]): IterableUpdateDefinition[T] = {
+    new IterableUpdateDefinition[T] {
+      override def getFunction: PartialFunction[Event, Iterable[T]] = new PartialFunction[Event, Iterable[T]] {
+        override def isDefinedAt(x: Event): Boolean = f.isDefinedAt(x)
+        override def apply(e: Event): Iterable[T] = List(f.apply(e))
+      }
+    }
+  }
+
+  def genIterableUpdateDefinitionIt[T](f: PartialFunction[Event, Iterable[T]]): IterableUpdateDefinition[T] = {
+    new IterableUpdateDefinition[T] {
+      override def getFunction: PartialFunction[Event, Iterable[T]] = new PartialFunction[Event, Iterable[T]] {
+        override def isDefinedAt(x: Event): Boolean = f.isDefinedAt(x)
+        override def apply(e: Event): Iterable[T] = f.apply(e)
+      }
+    }
+  }
+
+  def counter[T](f: PartialFunction[Event, T]) = {
+    s.counter(genIterableUpdateDefinition(f))
+  }
+
+  val searchesByTimeOfDay = counter {
+    case pv: ProductView => {
+      val cal = new GregorianCalendar(TimeZone.getTimeZone("America/Los_Angeles"))
+      cal.setTimeInMillis(pv.ts)
+      cal.get(Calendar.HOUR_OF_DAY)
+    }
+  }
+
+  xx.foreach { pv: ProductView =>
+    s.update(Array(pv))
+    pm.increment()
+  }
+
+  println("searches by time of day")
+  searchesByTimeOfDay.toMap.toArray.sortBy(_._1).foreach(println)
+
   pm.finished()
 
-
-//  override protected def getEventProcessor(): EventProcessor = new EventProcessor {
+  //  override protected def getEventProcessor(): EventProcessor = new EventProcessor {
 //    val pm = new ProgressMeter()
 //    override def init(): Unit = {
 //    }

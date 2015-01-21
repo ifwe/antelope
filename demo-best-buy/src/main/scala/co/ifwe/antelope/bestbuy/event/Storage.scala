@@ -2,7 +2,9 @@ package co.ifwe.antelope.bestbuy.event
 
 import java.io._
 
-object ProductViewStorage {
+import co.ifwe.antelope.Event
+
+object Storage {
   def readEvents(fn: String): Iterable[ProductView] = {
     val r = new DataInputStream(new BufferedInputStream(new FileInputStream(fn), 65536))
     // TODO think about how to do exception handling properly here - perhaps return a closeable resource
