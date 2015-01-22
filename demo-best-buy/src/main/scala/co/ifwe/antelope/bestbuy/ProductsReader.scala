@@ -17,12 +17,12 @@ object ProductsReader {
   def read(fn: URL): Iterable[ProductUpdate] = {
     val catalog = XML.load(fn)
     for (x <- catalog \\ "product") yield {
-      val ts = (x \ "activeUpdateDate" text)
+      val ts = (x \ "startDate" text)
       val sku = (x \ "sku" text)
       val name = (x \ "name" text)
       val description = (x \ "longDescription" text)
       val categories = (x \\ "category" \ "name").map(_.text).toArray
-      new ProductUpdate(IOUtil.getProductTime(ts), sku.toLong, name, description, categories)
+      new ProductUpdate(IOUtil.getProductDate(ts), sku.toLong, name, description, categories)
     }
   }
 

@@ -27,6 +27,11 @@ object IOUtil {
     productDf.parse(timeStr).getTime
   }
 
+  val productStartDate = dateFormat("yyyy-MM-dd")
+  def getProductDate(timeStr: String): Long = {
+    productStartDate.parse(timeStr).getTime
+  }
+
   def getUser(userStr: String): Long = {
     java.lang.Long.parseUnsignedLong(userStr.substring(0, 16), 16) & 0x7fffffffffffffffL
   }
