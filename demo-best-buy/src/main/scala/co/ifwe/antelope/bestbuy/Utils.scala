@@ -1,6 +1,6 @@
-package co.ifwe.antelope.bestbuy.exec.explore
+package co.ifwe.antelope.bestbuy
 
-import java.util.{Calendar, TimeZone, GregorianCalendar}
+import java.util.{Calendar, GregorianCalendar, TimeZone}
 
 object Utils {
   val cal = new GregorianCalendar(TimeZone.getTimeZone("America/Los_Angeles"))

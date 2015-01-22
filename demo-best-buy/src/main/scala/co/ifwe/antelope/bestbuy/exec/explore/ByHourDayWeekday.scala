@@ -1,7 +1,8 @@
 package co.ifwe.antelope.bestbuy.exec.explore
 
+import co.ifwe.antelope.bestbuy.Utils
 import co.ifwe.antelope.bestbuy.event.ProductView
-import co.ifwe.antelope.bestbuy.exec.explore.Utils._
+import Utils._
 
 /**
  * This implementation has pretty respectable performance as well as good readability

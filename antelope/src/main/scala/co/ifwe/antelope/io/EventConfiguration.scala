@@ -7,7 +7,7 @@ import co.ifwe.antelope.{Event, EventSourceProcessor}
 import scala.collection.mutable.ArrayBuffer
 
 trait EventConfiguration {
-  private val processors = ArrayBuffer[(URL, EventSourceProcessor[_<:Event])]()
+  protected val processors = ArrayBuffer[(URL, EventSourceProcessor[_<:Event])]()
   def addEvents[T<:Event](source: URL, ep: EventSourceProcessor[T]): Unit = {
     processors += ((source, ep))
   }

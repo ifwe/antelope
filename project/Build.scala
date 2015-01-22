@@ -25,6 +25,7 @@ object PredictBuild extends Build {
     settings = buildSettings ++ Seq (
       name := "antelope",
       libraryDependencies := libraryDependencies.value ++ Seq(
+        "tv.cntt" %% "chill-scala" % "1.2",
         "org.slf4j" % "slf4j-simple" % "1.7.7",
         "org.scalatest" %% "scalatest" % "2.2.2"
       )
@@ -42,7 +43,7 @@ object PredictBuild extends Build {
     settings = buildSettings ++ ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ Seq(
       name := "Antelope Best Buy Demo",
       resolvers += Classpaths.typesafeReleases,
-      libraryDependencies ++= Seq(
+      libraryDependencies ++= Seq (
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
