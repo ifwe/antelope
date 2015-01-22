@@ -1,6 +1,5 @@
 package co.ifwe.antelope.bestbuy.event
 
-import co.ifwe.antelope.bestbuy.Product
 import co.ifwe.antelope.{Event, util}
 
 /**
@@ -11,8 +10,7 @@ import co.ifwe.antelope.{Event, util}
  * @param name product name (game title)
  * @param description (product description text)
  */
-case class ProductUpdate(ts: Long, override val sku: Long, override val name: String, override val description: String, override val categories: Array[String])
-  extends Product(sku, name, description, categories) with Event {
+case class ProductUpdate(ts: Long, val sku: Long, val name: String, val description: String, val categories: Array[String]) extends Event {
   protected def shortDesc: String = {
     if (description.length > 40) {
       description.substring(0,37) + "..."
@@ -36,8 +34,6 @@ case class ProductUpdate(ts: Long, override val sku: Long, override val name: St
 }
 
 object ProductUpdate {
-  def apply(ts: Long, product: Product) = {
-    new ProductUpdate(ts, product.sku, product.name, product.description, product.categories)
-  }
+  val MISSING_PRODUCT = new ProductUpdate(0L, 0L, "NO PRODUCT", "", Array[String]())
 }
 

@@ -1,18 +1,30 @@
 package co.ifwe.antelope.bestbuy
 
-import java.io.{PrintWriter, BufferedWriter, FileWriter}
+import java.io._
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 object IOUtil {
 
-  val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-  val backupDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+  private def dateFormat(fmt: String) = {
+    val df = new SimpleDateFormat(fmt)
+    df.setTimeZone(TimeZone.getTimeZone("GMT"))
+    df
+  }
+
+  private val df = dateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+  private val backupDf = dateFormat("yyyy-MM-dd HH:mm:ss")
   def getTime(timeStr: String): Long = {
     try {
       df.parse(timeStr).getTime
     } catch {
       case e: java.text.ParseException => backupDf.parse(timeStr).getTime
     }
+  }
+
+  val productDf = dateFormat("yyyy-MM-dd'T'HH:mm:ss")
+  def getProductTime(timeStr: String): Long = {
+    productDf.parse(timeStr).getTime
   }
 
   def getUser(userStr: String): Long = {
@@ -37,4 +49,11 @@ object IOUtil {
     }
   }
 
+  def findFiles(path: String, filter: String => Boolean): Iterable[String] = {
+    (new File(path)).listFiles(new FilenameFilter {
+      override def accept(dir: File, name: String): Boolean = {
+        filter(name)
+      }
+    }).map(_.getPath)
+  }
 }

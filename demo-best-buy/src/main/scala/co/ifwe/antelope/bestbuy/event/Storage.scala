@@ -83,6 +83,10 @@ object Storage {
   }
 
   def readEvents(fn: String): Iterable[Event] = {
+    val f = new File(fn)
+    if (!f.exists()) {
+      throw new FileNotFoundException(s"$fn does not exist")
+    }
     val r = new BufferedInputStream(new FileInputStream(fn), 65536)
     readEvents(r)
   }
@@ -90,13 +94,13 @@ object Storage {
   def readEvents(is: InputStream): Iterable[Event] = {
     val input = new DataInputStream(is)
     // TODO think about how to do exception handling properly here - perhaps return a closeable resource
-    new Iterable[ProductView]() {
-      override def iterator: Iterator[ProductView] = {
-        new Iterator[ProductView] {
-          var nextRes: ProductView = readNext()
-          def readNext(): ProductView = {
+    new Iterable[Event]() {
+      override def iterator: Iterator[Event] = {
+        new Iterator[Event] {
+          var nextRes: Event = readNext()
+          def readNext(): Event = {
             try {
-              read(input).asInstanceOf[ProductView]
+              read(input).asInstanceOf[Event]
             } catch {
               case e: EOFException => {
                 input.close()
@@ -107,7 +111,7 @@ object Storage {
 
           override def hasNext: Boolean = nextRes != null
 
-          override def next(): ProductView = {
+          override def next(): Event = {
             val res = nextRes
             nextRes = readNext()
             res
