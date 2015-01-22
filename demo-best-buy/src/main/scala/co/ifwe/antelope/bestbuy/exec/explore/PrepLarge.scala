@@ -20,16 +20,22 @@ object PrepLarge extends App {
     (size / 1000) / 1000D
   }
 
-  for (fn <- productFiles.take(10)) {
+
+//  Storage.writeEvents(productsDirectory + File.separatorChar + "products.bin",
+//    productFiles.map(fn => ProductsReader.fromFile(fn).map(ProductUpdate(0L,_))).reduce((a,b) => a.toStream ++ b.toStream))
+  var i = 0
+  for (fn <- productFiles) {
     val f = new File(fn)
     val len = f.length()
     println(s"open ${f.getName} with size ${getMb(len)} mb")
     val startTime = System.currentTimeMillis()
-    val products = ProductsReader.fromFile(fn).map(ProductUpdate(0L,_))
+    val products = ProductsReader.fromFile(fn).toArray.sortBy(_.ts)
     val binFn = fn + ".bin"
     Storage.writeEvents(binFn, products)
     println(s"read products at ${System.currentTimeMillis() - startTime}")
     println(s"number of products: ${products.size}")
     println(s"counted products at ${System.currentTimeMillis() - startTime}")
+    println(s"at $i")
+    i += 1
   }
 }

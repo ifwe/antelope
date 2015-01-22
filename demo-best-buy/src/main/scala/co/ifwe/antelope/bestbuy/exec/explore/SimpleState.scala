@@ -20,7 +20,7 @@ trait SimpleState {
   }
 
   def update(e: Event): Unit = {
-    registered.foreach(_(e))
+    registered.foreach(pf => if (pf.isDefinedAt(e)) pf(e))
   }
 
   private val registered = new mutable.ArrayBuffer[PartialFunction[Event, Unit]]

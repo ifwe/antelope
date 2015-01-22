@@ -38,7 +38,7 @@ trait EventProcessing {
   try {
     ep.start()
 
-    ep.process(ProductsReader.fromFile(productsFn).map(ProductUpdate(0L,_)), productUpdateLimit())
+    ep.process(ProductsReader.fromFile(productsFn), productUpdateLimit())
 
     val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
     val backupDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

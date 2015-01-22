@@ -9,12 +9,14 @@ object ByHour extends ExploreApp {
 
   val cal = new GregorianCalendar(TimeZone.getTimeZone("America/Los_Angeles"))
 
-  events.foreach { case pv: ProductView =>
-    cal.setTimeInMillis(pv.ts)
-    cts(cal.get(Calendar.HOUR_OF_DAY)) += 1
+  events.foreach {
+    case pv: ProductView =>
+      cal.setTimeInMillis(pv.ts)
+      cts(cal.get(Calendar.HOUR_OF_DAY)) += 1
+    case _ =>
   }
 
-  println(cts)
+  println(cts.mkString(" "))
 
   printTiming()
 }
