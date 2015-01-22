@@ -1,8 +1,13 @@
 package co.ifwe.antelope.util
 
 abstract class CustomIterator[T] extends Iterator[T] {
-  var nextRet: T = advance()
+
+  def init(): Unit = { }
   def advance():T
+
+  init()
+  var nextRet: T = advance()
+
   override def hasNext: Boolean = nextRet != null
 
   override def next(): T = {
