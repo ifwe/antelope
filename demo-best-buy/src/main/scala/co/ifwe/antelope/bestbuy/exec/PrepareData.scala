@@ -14,4 +14,6 @@ object PrepareData extends App {
     new ProductView(getTime(e("click_time")), getTime(e("query_time")), getUser(e("user")), e("query"), e("sku").toLong))
   Storage.writeEvents(viewsFnBin, xx)
   pm.finished()
+
+
 }

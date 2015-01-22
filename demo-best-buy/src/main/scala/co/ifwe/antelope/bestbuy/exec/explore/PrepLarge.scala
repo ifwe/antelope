@@ -3,6 +3,7 @@ package co.ifwe.antelope.bestbuy.exec.explore
 import java.io.{FilenameFilter, File}
 
 import co.ifwe.antelope.bestbuy.ProductsReader
+import co.ifwe.antelope.bestbuy.event.{ProductUpdate, Storage}
 
 object PrepLarge extends App {
   var ct = 0
@@ -24,7 +25,9 @@ object PrepLarge extends App {
     val len = f.length()
     println(s"open ${f.getName} with size ${getMb(len)} mb")
     val startTime = System.currentTimeMillis()
-    val products = ProductsReader.fromFile(fn)
+    val products = ProductsReader.fromFile(fn).map(ProductUpdate(0L,_))
+    val binFn = fn + ".bin"
+    Storage.writeEvents(binFn, products)
     println(s"read products at ${System.currentTimeMillis() - startTime}")
     println(s"number of products: ${products.size}")
     println(s"counted products at ${System.currentTimeMillis() - startTime}")

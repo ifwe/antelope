@@ -12,7 +12,7 @@ object ByHourInHash extends ExploreApp {
 
   val cal = new GregorianCalendar(TimeZone.getTimeZone("America/Los_Angeles"))
 
-  events.foreach { pv: ProductView =>
+  events.foreach { case pv: ProductView =>
     cal.setTimeInMillis(pv.ts)
     val hr = cal.get(Calendar.HOUR_OF_DAY)
     cts.put(hr, cts.getOrElse(hr, 0))

@@ -2,7 +2,11 @@ package co.ifwe.antelope.bestbuy.event
 
 import java.io._
 
+import co.ifwe.antelope.Event
+
 import scala.language.existentials
+
+import scala.reflect.runtime.universe._
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -31,37 +35,59 @@ object Storage {
     }
   }
 
-//  class ProductUpdateSerializer extends Serializer[ProductUpdate] {
-    //val ts: Long, sku: Long, name: String, description: String, categories: Array[String]
-//  }
+  class ProductUpdateSerializer extends Serializer[ProductUpdate] {
+    override def write(output: DataOutput, productUpdate: ProductUpdate): Unit = {
+      output.writeLong(productUpdate.ts)
+      output.writeLong(productUpdate.sku)
+      output.writeUTF(productUpdate.name)
+      output.writeUTF(productUpdate.description)
+      output.writeInt(productUpdate.categories.length)
+      productUpdate.categories.foreach(output.writeUTF)
+    }
 
+    override def read(input: DataInput): ProductUpdate = {
+      val ts = input.readLong()
+      val sku = input.readLong()
+      val name = input.readUTF()
+      val description = input.readUTF()
+      val numCategories = input.readInt()
+      val categories = new Array[String](numCategories)
+      for (i <- 0 until numCategories) {
+        categories(i) = input.readUTF()
+      }
+      new ProductUpdate(ts, sku, name, description, categories)
+    }
+  }
+  val mirror = runtimeMirror(Storage.getClass.getClassLoader)
   var nextId: Short = 1
-  val m = ArrayBuffer[Tuple2[Short, Serializer[_]]]()
+  val m = ArrayBuffer[(Type, Short, Serializer[_])]()
   register(new ProductViewSerializer())
+  register(new ProductUpdateSerializer())
 
-  def register[T](s: Serializer[T]): Unit = {
-    m.append((nextId, s))
+  def register[T](s: Serializer[T])(implicit tag: TypeTag[T]): Unit = {
+    m.append((tag.tpe, nextId, s))
     nextId  = (nextId + 1).toShort
   }
 
-  def write[T](output: DataOutput, x: T): Unit = {
-    val (id, s) = m.find(_._2.isInstanceOf[Serializer[T]]).get
+  def write[T](output: DataOutput, x: T)(implicit tag: TypeTag[T]): Unit = {
+    val rt = mirror.classSymbol(x.getClass).toType
+    val (_,id, s) = m.find(_._1 == rt).get
     output.writeShort(id)
     s.asInstanceOf[Serializer[T]].write(output, x)
   }
 
   def read(input: DataInput) = {
     val id = input.readShort()
-    val (_, s) = m.find(_._1==id).get
+    val (_, _, s) = m.find(_._2 == id).get
     s.read(input)
   }
 
-  def readEvents(fn: String): Iterable[ProductView] = {
+  def readEvents(fn: String): Iterable[Event] = {
     val r = new BufferedInputStream(new FileInputStream(fn), 65536)
     readEvents(r)
   }
 
-  def readEvents(is: InputStream): Iterable[ProductView] = {
+  def readEvents(is: InputStream): Iterable[Event] = {
     val input = new DataInputStream(is)
     // TODO think about how to do exception handling properly here - perhaps return a closeable resource
     new Iterable[ProductView]() {
@@ -91,7 +117,7 @@ object Storage {
     }
   }
 
-  def writeEvents(fn: String, events: Iterable[ProductView]): Unit = {
+  def writeEvents(fn: String, events: Iterable[Event]): Unit = {
     val os = new BufferedOutputStream(new FileOutputStream(fn))
     try {
       writeEvents(os, events)
@@ -100,7 +126,7 @@ object Storage {
     }
   }
 
-  def writeEvents(os: OutputStream, events: Iterable[ProductView]): Unit = {
+  def writeEvents(os: OutputStream, events: Iterable[Event]): Unit = {
     val output = new DataOutputStream(os)
     events.foreach { e =>
       write(output, e)

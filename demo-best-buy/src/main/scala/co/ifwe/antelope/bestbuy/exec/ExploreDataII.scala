@@ -69,7 +69,7 @@ object ExploreDataII extends App {
     }
   }
 
-  xx.foreach { pv: ProductView =>
+  xx.foreach { case pv: ProductView =>
     s.update(Array(pv))
     pm.increment()
   }

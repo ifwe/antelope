@@ -2,7 +2,7 @@ package co.ifwe.antelop.bestbuy.event
 
 import java.io.{DataOutputStream, DataInputStream, ByteArrayInputStream, ByteArrayOutputStream}
 
-import co.ifwe.antelope.bestbuy.event.{ProductView, Storage}
+import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView, Storage}
 import org.scalatest.FlatSpec
 
 class StorageSpec extends FlatSpec {
@@ -32,5 +32,17 @@ class StorageSpec extends FlatSpec {
     is.close
     assert(eventsRead.size === 2)
     assert(eventsRead === events)
+  }
+
+  it should "serialize a ProductUpdate" in {
+    val os = new ByteArrayOutputStream()
+    val event = new ProductUpdate(1L, 2L, "testname", "testdescription", Array("category1", "category2"))
+    Storage.write(new DataOutputStream(os), event)
+    os.close()
+
+    val is = new ByteArrayInputStream(os.toByteArray)
+    val eventRead = Storage.read(new DataInputStream(is))
+    is.close
+    assert(eventRead === event)
   }
 }
