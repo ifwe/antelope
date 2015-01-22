@@ -28,7 +28,7 @@ case class ProductUpdate(ts: Long, override val sku: Long, override val name: St
     if (o.isInstanceOf[ProductUpdate]) {
       val op = o.asInstanceOf[ProductUpdate]
       this.ts == op.ts && this.sku == op.sku && this.name == op.name && this.description == op.description &&
-        this.categories.size == op.categories.size && this.categories.zip(op.categories).map(x => x._1 == x._2).foldLeft(true)((a,b) => a && b)
+        this.categories.size == op.categories.size && this.categories.zip(op.categories).map(x => x._1 == x._2).reduce((a,b) => a && b)
     } else {
       false
     }
