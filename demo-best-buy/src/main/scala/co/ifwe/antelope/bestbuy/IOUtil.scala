@@ -29,7 +29,11 @@ object IOUtil {
 
   val productStartDate = dateFormat("yyyy-MM-dd")
   def getProductDate(timeStr: String): Long = {
-    productStartDate.parse(timeStr).getTime
+    if ("" == timeStr) {
+      0L
+    } else {
+      productStartDate.parse(timeStr).getTime
+    }
   }
 
   def getUser(userStr: String): Long = {
