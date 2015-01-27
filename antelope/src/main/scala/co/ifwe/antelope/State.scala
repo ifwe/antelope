@@ -195,13 +195,18 @@ class State[T <: ScoringContext] {
 
       override def increment: PartialFunction[Event, Unit] = f andThen (x => x.foreach {
         k => {
-          m.put(k, m.getOrDefault(k, 0) + 1)
+          m.put(k, apply(k) + 1)
           totalCt += 1
         }
       })
 
       override def apply(k: String): Long = {
-        m.getOrDefault(k, 0L)
+        val res = m.get(k)
+        if (res == null) {
+          0L
+        } else {
+          res
+        }
       }
 
       override def apply(): Long = totalCt
