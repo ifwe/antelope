@@ -39,12 +39,13 @@ class BestBuyModel extends Model[ProductSearchScoringContext] {
   val hourInMilliseconds = 60 * 60 * 1000
   val dayInMilliseconds = 24 * hourInMilliseconds
   feature(new OverallPopularityFeature(skuSelected))
-  feature(new RecentPopularityFeature(skuAndTime, hourInMilliseconds))
-  feature(new RecentPopularityFeature(skuAndTime, dayInMilliseconds))
+//  feature(new RecentPopularityFeature(skuAndTime, hourInMilliseconds))
+//  feature(new RecentPopularityFeature(skuAndTime, dayInMilliseconds))
   feature(new RecentPopularityFeature(skuAndTime, 3 * dayInMilliseconds))
-  feature(new RecentPopularityFeature(skuAndTime, 7 * dayInMilliseconds))
+//  feature(new RecentPopularityFeature(skuAndTime, 7 * dayInMilliseconds))
+
   for (te <- List(terms, bigrams)) {
-    feature(new TermPopularityFeature(skuSelected, new TermsFromText(te)))
+//    feature(new TermPopularityFeature(skuSelected, new TermsFromText(te)))
     feature(new TfIdfFeature(catalogSku, new TermsProductUpdate(te)))
   }
 
