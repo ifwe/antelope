@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat
 
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope._
+import co.ifwe.antelope.bestbuy.IOUtil._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
-import co.ifwe.antelope.bestbuy.exec.LearnedRankerTraining.TRAINING_LIMIT
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.slf4j.LoggerFactory
@@ -68,7 +68,7 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
   }
 
   ep.start()
-  ep.process(ProductsReader.fromFile(productsFn).map(ProductUpdate(0L,_)))
+  ep.process(ProductsReader.fromFile(productsFn))
   val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
   val backupDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
   def getTime(timeStr: String): Long = {
@@ -78,9 +78,9 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
       case e: java.text.ParseException => backupDf.parse(timeStr).getTime
     }
   }
-  ep.process(EventSource.fromFile(viewsFn).map(e =>
-    new ProductView(getTime(e("click_time")), e("query"), e("sku").toLong)), TRAINING_LIMIT)
-
+  ep.process(EventSource.fromFile(viewsFn).map(fields =>
+    new ProductView(getTime(fields("click_time")), getTime(fields("query_time")),
+      getUser(fields("user")), fields("query"), fields("sku").toLong)))
 
   case class Query(query: String)
   case class Results(success: Boolean, data: Array[Long])
@@ -122,7 +122,7 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
   post("/search") {
     val query = params("query")
     logger.info(s"doing a search for '$query'")
-    val results = ep.topDocs(query, 10)
+    val results = ep.topDocs(query, Long.MaxValue, 10)
     buildResults(results)
   }
   
