@@ -35,9 +35,9 @@ trait ExploreApp extends App with CachedEventConfiguration {
       override def accept(dir: File, name: String): Boolean = {
         name.toLowerCase().endsWith(".xml")
       }
-    }).map(_.toURI.toURL)
+    }).map(_.toURI.toURL).toArray
 
-  addEvents(productFiles.toArray.take(5), new XmlEventSourceProcessor[ProductUpdate] {
+  addEvents(productFiles, new XmlEventSourceProcessor[ProductUpdate] {
     override def getEventTag(): String = "product"
     override def getEvent(node: Node): ProductUpdate = {
       val ts = (node \ "startDate" text)
