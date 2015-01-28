@@ -201,11 +201,11 @@ class State[T <: ScoringContext] {
       })
 
       override def apply(k: String): Long = {
-        val res = m.get(k)
+        val res:Any = m.get(k)
         if (res == null) {
           0L
         } else {
-          res
+          res.asInstanceOf[Long]
         }
       }
 
