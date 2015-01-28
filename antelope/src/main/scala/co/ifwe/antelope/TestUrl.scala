@@ -10,7 +10,7 @@ object TestUrl extends App {
   val oracle = this.getClass.getClassLoader.getResource("sample_events.csv")
   val  in = new BufferedReader(new InputStreamReader(oracle.openStream()))
   try {
-    for (line <- Source.fromURL(oracle).getLines()) {
+    for (line <- Source.fromURL(oracle,"UTF-8").getLines()) {
       println(line)
     }
   } finally {
