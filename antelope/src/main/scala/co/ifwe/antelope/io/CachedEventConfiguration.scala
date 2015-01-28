@@ -4,9 +4,11 @@ import java.net.URL
 
 import co.ifwe.antelope.Event
 
+
 trait CachedEventConfiguration extends EventConfiguration {
   def storage(): KryoEventStorage
-  val cache = new CachedEvents("/Users/johann/tmp/antelope", storage)
+  val cacheDir: String
+  val cache = new CachedEvents(cacheDir, storage)
 
   def getIdentifier(url: URL): String = {
     s"${url.getProtocol}:${url.getHost}:${url.getFile}:${url.getPort}:${url.getRef}"

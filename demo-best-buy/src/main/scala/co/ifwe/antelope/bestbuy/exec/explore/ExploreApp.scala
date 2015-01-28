@@ -15,6 +15,7 @@ import scala.xml.Node
 trait ExploreApp extends App with CachedEventConfiguration {
   private val startTime = System.currentTimeMillis()
   private val pm = new ProgressMeter(printInterval = 50000)
+  override val cacheDir = FileLocations.cacheDir
   println(s"starting tests at ${System.currentTimeMillis() - startTime}")
 
   override def storage = new KryoEventStorage {
