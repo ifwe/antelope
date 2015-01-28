@@ -3,7 +3,7 @@ package co.ifwe.antelope.bestbuy
 import java.io.File
 import java.text.SimpleDateFormat
 
-import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
+import co.ifwe.antelope.bestbuy.event.ProductView
 import co.ifwe.antelope.{EventProcessor, EventSource}
 
 /**

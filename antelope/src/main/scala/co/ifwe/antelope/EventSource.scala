@@ -10,7 +10,7 @@ object EventSource {
   def fromFile(fn: String): EventSource = {
     new EventSource() {
       override def iterator: Iterator[MapEvent] = new Iterator[MapEvent] {
-        val lines = Source.fromFile(fn).getLines()
+        val lines = Source.fromFile(fn,"UTF-8").getLines()
         val header = lines.next()
         val keys = header.split(",").zipWithIndex.toMap
         var nextLine = lines.next()

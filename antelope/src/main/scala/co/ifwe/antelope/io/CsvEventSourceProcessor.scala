@@ -11,7 +11,7 @@ abstract class CsvEventSourceProcessor[T<:Event] extends EventSourceProcessor[T]
   override def getEvents(url: URL): Iterable[T] = {
     new Iterable[T] {
       override def iterator = new Iterator[T] {
-        val lines = Source.fromURL(url).getLines
+        val lines = Source.fromURL(url,"UTF-8").getLines
         val headerKeys = if (lines.hasNext) lines.next.split(",").zipWithIndex.toMap else null
         var nextRet: T = advance()
         def advance(): T = {
