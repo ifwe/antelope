@@ -7,7 +7,7 @@ import co.ifwe.antelope.Event
 
 trait CachedEventConfiguration extends EventConfiguration {
   def storage(): KryoEventStorage
-  val cacheDir: String
+  def cacheDir(): String
   val cache = new CachedEvents(cacheDir, storage)
 
   def getIdentifier(url: URL): String = {
