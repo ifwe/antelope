@@ -19,7 +19,7 @@ object Event {
     override def compare(x: Event, y: Event): Int = {
       val tsx = x.ts
       val tsy = y.ts
-      if (tsx > tsy) {
+      if (tsx < tsy) {
         -1
       } else if (tsx == tsy) {
         0
