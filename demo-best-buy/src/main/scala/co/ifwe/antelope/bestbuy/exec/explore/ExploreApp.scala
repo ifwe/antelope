@@ -22,7 +22,7 @@ trait ExploreApp extends App with CachedEventConfiguration {
     kryo.register(classOf[ProductUpdate])
     kryo.register(classOf[Array[String]])
   }
-  
+
   override def cacheDir = FileLocations.cacheDir
   
   addEvents(new File(FileLocations.viewsFn).toURI.toURL, new CsvEventSourceProcessor[ProductView] {
