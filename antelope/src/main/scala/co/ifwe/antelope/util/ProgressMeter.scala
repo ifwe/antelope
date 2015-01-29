@@ -13,15 +13,15 @@ class ProgressMeter(val printInterval: Long = 5000, val extraInfo: () => String 
     ct += 1
     if (ct % printInterval == 0) {
       println("progress %d".format(ct))
+      val extraStr = extraInfo()
+      if (extraStr != "") {
+        println("  " + extraStr)
+      }
     }
   }
 
   def finished(): Unit = {
     val elapsedTime = System.currentTimeMillis() - startTime
     println("completed %d in %d ms, rate of %d/s".format(ct, elapsedTime, ct*1000/elapsedTime))
-    val extraStr = extraInfo()
-    if (extraStr != "") {
-      println(extraStr)
-    }
   }
 }
