@@ -3,29 +3,14 @@ package co.ifwe.antelope.bestbuy.exec.explore
 import java.io.File
 
 import co.ifwe.antelope.TrainingExample
-import co.ifwe.antelope.bestbuy.BestBuyScoringContext
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
-import co.ifwe.antelope.bestbuy.model.{SpellingModel, BestBuyModel}
-import co.ifwe.antelope.io.{MultiFormatWriter, CsvTrainingFormatter}
+import co.ifwe.antelope.bestbuy.model.{BestBuyModel, SpellingModel}
+import co.ifwe.antelope.bestbuy.{BestBuyScoringContext, UniformTrainingSampling}
+import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter}
 import co.ifwe.antelope.util.ProgressMeter
 
-import collection.mutable
-import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
-
 object Training extends ExploreApp with SimpleState {
-  val allDocsSet = new mutable.HashSet[Long]()
-  val allDocsArray = new ArrayBuffer[Long]()
-  val rnd = new Random(23049L)
-  private def registerDoc(docId: Long): Unit = {
-    if (!allDocsSet.contains(docId)) {
-      allDocsSet += docId
-      allDocsArray += docId
-    }
-  }
-  private def getRandomDoc(): Long = {
-    allDocsArray(rnd.nextInt(allDocsArray.length))
-  }
+  val ts = new UniformTrainingSampling
 
   var viewCt = 0
   var updateCt = 0
@@ -49,11 +34,11 @@ object Training extends ExploreApp with SimpleState {
           viewCt += 1
           if (viewCt > TRAINING_START) {
             printTrainingResult(pv.skuSelected, true)
-            val randomDoc = getRandomDoc()
+            val randomDoc = ts.getDoc()
             printTrainingResult(randomDoc, randomDoc == pv.skuSelected)
           }
         case pu: ProductUpdate =>
-          registerDoc(pu.sku)
+          ts.registerDoc(pu.sku)
           updateCt += 1
       }
       pm.increment()
