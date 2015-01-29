@@ -30,12 +30,12 @@ object Training extends ExploreApp with SimpleState {
   val pm = new ProgressMeter()
   val m = new BestBuyModel
   val sm = new SpellingModel
-  val trainingWriter = new MultiFormatWriter(List((FileLocations.trainingDir + File.separatorChar + "training_data.csv",
+  val trainingWriter = new MultiFormatWriter(List((Config.trainingDir + File.separatorChar + "training_data.csv",
     new CsvTrainingFormatter(m.featureNames))))
   try {
     var viewCt = 0
-    val TRAINING_START = 100000
-    val TRAINING_LIMIT = 500000
+    val TRAINING_START = Config.trainingStart
+    val TRAINING_LIMIT = Config.trainingLimit
     val it = events.iterator
     while (it.hasNext && viewCt < TRAINING_LIMIT) {
       val e = it.next

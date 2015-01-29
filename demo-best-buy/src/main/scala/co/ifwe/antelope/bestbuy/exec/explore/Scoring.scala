@@ -2,10 +2,9 @@ package co.ifwe.antelope.bestbuy.exec.explore
 
 import java.io.File
 
-import co.ifwe.antelope.TrainingExample
-import co.ifwe.antelope.bestbuy.{TopDocsResult, MissAnalysis, RecommendationStats, BestBuyScoringContext}
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
 import co.ifwe.antelope.bestbuy.model.{BestBuyModel, SpellingModel}
+import co.ifwe.antelope.bestbuy.{BestBuyScoringContext, MissAnalysis, RecommendationStats, TopDocsResult}
 import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter}
 import co.ifwe.antelope.util.ProgressMeter
 
@@ -27,20 +26,19 @@ object Scoring extends ExploreApp with SimpleState {
     allDocsArray(rnd.nextInt(allDocsArray.length))
   }
 
-  val weights = Array(936626.9D,0D,0.02615726D,0.02090764D,0.02802838D,0.03497765D)
+  val weights = Array(52.77964D,39.74343D,0.08017773D,-0.01137886D,0.8648198D,0.08873818D)
 
   val pm = new ProgressMeter()
   val m = new BestBuyModel
   val sm = new SpellingModel
   val rs = new RecommendationStats()
   val ma = new MissAnalysis()
-  val trainingWriter = new MultiFormatWriter(List((FileLocations.trainingDir + File.separatorChar + "training_data.csv",
+  val trainingWriter = new MultiFormatWriter(List((Config.trainingDir + File.separatorChar + "training_data.csv",
     new CsvTrainingFormatter(m.featureNames))))
   try {
     var viewCt = 0
-    val TRAINING_START = 100000
-    val TRAINING_LIMIT = 500000
-    val SCORING_LIMIT = 1000000
+    val TRAINING_LIMIT = Config.trainingLimit
+    val SCORING_LIMIT = Config.scoringLimit
     val it = events.iterator
     while (it.hasNext && viewCt < SCORING_LIMIT) {
       val e = it.next
@@ -61,6 +59,7 @@ object Scoring extends ExploreApp with SimpleState {
           }
         case pu: ProductUpdate =>
           registerDoc(pu.sku)
+          ma.register(pu)
       }
       pm.increment()
       sm.update(e)
@@ -71,4 +70,5 @@ object Scoring extends ExploreApp with SimpleState {
   }
   pm.finished()
   println(ma.summarize())
+  println("%s finishing with stats: %s".format(m, rs))
 }
