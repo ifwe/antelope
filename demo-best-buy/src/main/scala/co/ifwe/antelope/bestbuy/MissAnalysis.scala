@@ -11,13 +11,10 @@ import scala.util.Random
 /**
  * Analysis of bad predictions
  */
-class MissAnalysis {
+class MissAnalysis(spellingPrintCtMax: Int = 25, nonSpellingPrintCtMax: Int = 0) {
   private var missCt = 0
   private var spellingPrintCt = 0
   private var nonSpellingPrintCt = 0
-
-  private val spellingPrintCtMax = 25
-  private val nonSpellingPrintCtMax = 0
 
   private val products = mutable.HashMap[Long,ProductUpdate]()
   val s = new State[ProductSearchScoringContext]

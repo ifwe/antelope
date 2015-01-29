@@ -4,11 +4,21 @@ import java.io.File
 
 object Config {
   private def getEnv(envVar: String): String = {
+    getEnvOption(envVar) match {
+      case Some(res) =>
+        res
+      case None =>
+        throw new IllegalArgumentException(s"must set $$$envVar environment variable")
+    }
+  }
+
+  private def getEnvOption(envVar: String): Option[String] = {
     val res = System.getenv(envVar)
     if (res == null || res.isEmpty) {
-      throw new IllegalArgumentException(s"must set $$$envVar environment variable")
+      None
+    } else {
+      Some(res)
     }
-    res
   }
 
   val dataDir = getEnv("ANTELOPE_DATA")
@@ -17,6 +27,10 @@ object Config {
   val trainingStart = getEnv("ANTELOPE_TRAINING_START").toLong
   val trainingLimit = getEnv("ANTELOPE_TRAINING_LIMIT").toLong
   val scoringLimit = getEnv("ANTELOPE_SCORING_LIMIT").toLong
+  val scoringTiming = getEnvOption("ANTELOPE_SCORING_TIMING") match {
+    case Some(x) => x.toBoolean
+    case None => false
+  }
 
   val viewsFn = dataDir + File.separator + "train_sorted.csv"
   val viewsFnBin = viewsFn + ".bin"

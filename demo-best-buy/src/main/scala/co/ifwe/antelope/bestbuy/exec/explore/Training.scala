@@ -27,13 +27,14 @@ object Training extends ExploreApp with SimpleState {
     allDocsArray(rnd.nextInt(allDocsArray.length))
   }
 
-  val pm = new ProgressMeter()
+  var viewCt = 0
+  var updateCt = 0
+  val pm = new ProgressMeter(extraInfo = () => s"{views: $viewCt, updates: $updateCt}")
   val m = new BestBuyModel
   val sm = new SpellingModel
   val trainingWriter = new MultiFormatWriter(List((Config.trainingDir + File.separatorChar + "training_data.csv",
     new CsvTrainingFormatter(m.featureNames))))
   try {
-    var viewCt = 0
     val TRAINING_START = Config.trainingStart
     val TRAINING_LIMIT = Config.trainingLimit
     val it = events.iterator
@@ -53,6 +54,7 @@ object Training extends ExploreApp with SimpleState {
           }
         case pu: ProductUpdate =>
           registerDoc(pu.sku)
+          updateCt += 1
       }
       pm.increment()
       sm.update(e)
