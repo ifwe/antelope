@@ -4,7 +4,7 @@ import java.io._
 
 import co.ifwe.antelope.EventSource
 import co.ifwe.antelope.bestbuy.event.ProductView
-import co.ifwe.antelope.bestbuy.exec.explore.FileLocations._
+import co.ifwe.antelope.bestbuy.exec.explore.Config._
 import co.ifwe.antelope.util.ProgressMeter
 
 /**

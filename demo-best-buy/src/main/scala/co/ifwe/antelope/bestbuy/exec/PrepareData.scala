@@ -4,7 +4,7 @@ import co.ifwe.antelope.EventSource
 import co.ifwe.antelope.bestbuy.event.{Storage, ProductView}
 import co.ifwe.antelope.util.ProgressMeter
 
-import co.ifwe.antelope.bestbuy.exec.explore.FileLocations._
+import co.ifwe.antelope.bestbuy.exec.explore.Config._
 
 object PrepareData extends App {
   import co.ifwe.antelope.bestbuy.IOUtil._

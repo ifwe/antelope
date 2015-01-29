@@ -23,9 +23,9 @@ trait ExploreApp extends App with CachedEventConfiguration {
     kryo.register(classOf[Array[String]])
   }
 
-  override def cacheDir = FileLocations.cacheDir
+  override def cacheDir = Config.cacheDir
   
-  addEvents(new File(FileLocations.viewsFn).toURI.toURL, new CsvEventSourceProcessor[ProductView] {
+  addEvents(new File(Config.viewsFn).toURI.toURL, new CsvEventSourceProcessor[ProductView] {
     override def getEvent(fields: Map[String, String]): ProductView = {
       new ProductView(getTime(fields("click_time")), getTime(fields("query_time")),
         getUser(fields("user")), fields("query"), fields("sku").toLong)
@@ -33,7 +33,7 @@ trait ExploreApp extends App with CachedEventConfiguration {
   })
 
   val productFiles =
-    (new File(FileLocations.productsDirectory)).listFiles(new FilenameFilter {
+    (new File(Config.productsDirectory)).listFiles(new FilenameFilter {
       override def accept(dir: File, name: String): Boolean = {
         name.toLowerCase().endsWith(".xml")
       }
@@ -53,7 +53,7 @@ trait ExploreApp extends App with CachedEventConfiguration {
 
   def save[K](titles: Iterable[String], c: Counter[K])(implicit ord: Ordering[K]): Unit = {
     val t = titles.toArray
-    val fn = FileLocations.trainingDir + File.separatorChar + t.map(_.replaceAll(" ","-")).mkString("_") + ".csv"
+    val fn = Config.trainingDir + File.separatorChar + t.map(_.replaceAll(" ","-")).mkString("_") + ".csv"
     val w = new PrintWriter(new FileWriter(fn))
     try {
       w.println(t.mkString(","))
