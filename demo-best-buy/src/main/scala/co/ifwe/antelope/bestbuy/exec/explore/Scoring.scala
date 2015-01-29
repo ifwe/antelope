@@ -1,11 +1,12 @@
 package co.ifwe.antelope.bestbuy.exec.explore
 
 import java.io.File
+import java.net.URL
 
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
 import co.ifwe.antelope.bestbuy.model.{BestBuyModel, SpellingModel}
 import co.ifwe.antelope.bestbuy.{BestBuyScoringContext, MissAnalysis, RecommendationStats, TopDocsResult}
-import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter}
+import co.ifwe.antelope.io.{WeightsReader, CsvTrainingFormatter, MultiFormatWriter}
 import co.ifwe.antelope.util.ProgressMeter
 
 import scala.collection.mutable
@@ -26,7 +27,8 @@ object Scoring extends ExploreApp with SimpleState {
     allDocsArray(rnd.nextInt(allDocsArray.length))
   }
 
-  val weights = Array(52.77964D,39.74343D,0.08017773D,-0.01137886D,0.8648198D,0.08873818D)
+  val weights = WeightsReader.getWeights(new File(Config.weightsFn).toURI.toURL)
+  println(s"scoring using wights (${weights.mkString(",")})")
 
   val pm = new ProgressMeter()
   val m = new BestBuyModel
