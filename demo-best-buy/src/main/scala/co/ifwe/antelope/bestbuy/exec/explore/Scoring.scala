@@ -30,15 +30,16 @@ object Scoring extends ExploreApp with SimpleState {
   val weights = WeightsReader.getWeights(new File(Config.weightsFn).toURI.toURL)
   println(s"scoring using wights (${weights.mkString(",")})")
 
-  val pm = new ProgressMeter()
+  var viewCt = 0
+  var updateCt = 0
+  val pm = new ProgressMeter(extraInfo = () => s"{views: $viewCt, updates: $updateCt}")
   val m = new BestBuyModel
   val sm = new SpellingModel
   val rs = new RecommendationStats()
-  val ma = new MissAnalysis()
+  val ma = new MissAnalysis(100,100)
   val trainingWriter = new MultiFormatWriter(List((Config.trainingDir + File.separatorChar + "training_data.csv",
     new CsvTrainingFormatter(m.featureNames))))
   try {
-    var viewCt = 0
     val TRAINING_LIMIT = Config.trainingLimit
     val SCORING_LIMIT = Config.scoringLimit
     val it = events.iterator
@@ -48,6 +49,7 @@ object Scoring extends ExploreApp with SimpleState {
         case pv: ProductView =>
           viewCt += 1
           if (viewCt > TRAINING_LIMIT) {
+            val startTime = System.currentTimeMillis()
             val scoringContext = new BestBuyScoringContext(pv.query, sm, pv.ts)
             // TODO arrayBuffer to array creates copy
             val docs = allDocsArray.toArray
@@ -58,8 +60,13 @@ object Scoring extends ExploreApp with SimpleState {
             if (!hit) {
               ma.miss(pv, td)
             }
+            if (Config.scoringTiming) {
+              val elapsedTime = startTime - System.currentTimeMillis()
+              println(s"""score in $elapsedTime ms for query "${pv.query}" with hit: $hit""")
+            }
           }
         case pu: ProductUpdate =>
+          updateCt += 1
           registerDoc(pu.sku)
           ma.register(pu)
       }
