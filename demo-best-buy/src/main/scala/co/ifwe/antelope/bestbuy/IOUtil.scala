@@ -65,4 +65,14 @@ object IOUtil {
       }
     }).map(_.getPath)
   }
+
+  def copy(is: InputStream, os: OutputStream): Unit = {
+    val buffer = new Array[Byte](65536)
+    var length = is.read(buffer)
+    while (length != -1) {
+      println(s"writing with length $length")
+      os.write(buffer, 0, length)
+      length = is.read(buffer)
+    }
+  }
 }

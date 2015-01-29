@@ -31,6 +31,7 @@ object Config {
     case Some(x) => x.toBoolean
     case None => false
   }
+  val rCommand = getEnv("ANTELOPE_R_COMMAND")
 
   val viewsFn = dataDir + File.separator + "train_sorted.csv"
   val viewsFnBin = viewsFn + ".bin"
