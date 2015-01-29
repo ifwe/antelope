@@ -24,4 +24,5 @@ object Config {
   val productsDirectory = dataDir + File.separator + "product_data/products"
   val mergedProducts = productsDirectory + File.separatorChar + "products_merged.bin"
   val allEvents = dataDir + File.separator + "all_events.bin"
+  val weightsFn = trainingDir + File.separator + "r_logit_coef.txt"
 }
