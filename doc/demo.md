@@ -71,7 +71,7 @@ section.  This demo ships with effective model parameters.
 
 Your coefficients should look like the following
 
-    87.48098,3013.327,0.1203471,4506.025,-0.02656143
+    88.77053,2437.086,0.1170896,7670.614,-0.02810121
 
 You can verify that these are hardcoded in the class
 [co.ifwe.antelope.bestbuy.exec.LearnedRankerScoring](../demo/src/main/scala/co/ifwe/antelope/bestbuy/exec/LearnedRankerScoring.scala).
@@ -90,9 +90,9 @@ You should see something like the following final output
     progress 39000
     progress 39500
     progress 40000
-    co.ifwe.antelope.bestbuy.model.BestBuyModel@65851435 finishing with stats: 8479/10000 hits for 84.8%
-    completed 40000 in 16182 ms, rate of 2471/s
-    [success] Total time: 19 s, completed Nov 13, 2014 4:37:50 PM
+    co.ifwe.antelope.bestbuy.model.BestBuyModel@65851435 finishing with stats: 8472/10000 hits for 84.7%
+    completed 40000 in 17337 ms, rate of 2307/s
+    [success] Total time: 20 s, completed Feb 25, 2015 1:23:22 PM
 
 That's it, you've successfully trained and scored a model!  In this case the hit percentage represents the
 fraction of rankings that contain the product viewed by the user within the first top 5 results.

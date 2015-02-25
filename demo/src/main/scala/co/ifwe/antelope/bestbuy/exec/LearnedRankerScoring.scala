@@ -14,7 +14,7 @@ object LearnedRankerScoring extends App with EventProcessing {
     val rs = new RecommendationStats()
 
     new ModelEventProcessor(
-        weights = Array(87.48098,3013.327,0.1203471,4506.025,-0.02656143),
+        weights = Array(88.77053,2437.086,0.1170896,7670.614,-0.02810121),
         progressPrintInterval = 500) {
       var viewCt = 0
 
