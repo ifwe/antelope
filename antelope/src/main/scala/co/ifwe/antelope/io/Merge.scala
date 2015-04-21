@@ -2,6 +2,10 @@ package co.ifwe.antelope.io
 
 import scala.collection.mutable
 
+/**
+ * Generic merge implementation of iterable of iterables. Uses
+ * priority queue internally.
+ */
 object Merge {
 
   class MergeException[T](val x: T, val y: T) extends RuntimeException { }

@@ -2,6 +2,9 @@ package co.ifwe.antelope
 
 import scala.io.Source
 
+/**
+ * Source of MapEvents, simple event representation
+ */
 trait EventSource extends Iterable[MapEvent] {
 
 }

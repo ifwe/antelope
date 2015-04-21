@@ -1,5 +1,12 @@
 package co.ifwe.antelope
 
+/**
+ * Spelling correction transformations:
+ *  - Remove letters
+ *  - Add letters
+ *  - Modify letters
+ *  - Transpose letters
+ */
 object Spelling {
 
   def removeLetterPermutations(s: String): Iterable[String] = {

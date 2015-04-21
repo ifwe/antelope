@@ -8,6 +8,18 @@ import com.esotericsoftware.kryo.KryoException
 import com.twitter.chill.ScalaKryoInstantiator
 import com.esotericsoftware.kryo.io.{Input, Output}
 
+/**
+ * Event storage using the Kryo serialization protocol. Note that
+ * this implementation requires registration, e.g. as,
+ * {{{
+ *   new KryoEventStorage {
+ *     kryo.register(classOf[ProductView])
+ *     kryo.register(classOf[ProductUpdate])
+ *     kryo.register(classOf[Array[String]])
+ *   }
+ * }}}
+ *
+ */
 trait KryoEventStorage extends EventStorage {
   private val instantiator = new ScalaKryoInstantiator
   protected val kryo = instantiator.newKryo()

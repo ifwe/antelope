@@ -4,6 +4,10 @@ import java.io.{InputStream, OutputStream}
 
 import co.ifwe.antelope.Event
 
+/**
+ * Interface for writing events to streams and for reading events
+ * from streams.
+ */
 trait EventStorage {
   trait EventWriter {
     def write(e: Event)

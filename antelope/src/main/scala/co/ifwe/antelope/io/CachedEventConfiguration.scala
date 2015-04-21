@@ -4,7 +4,12 @@ import java.net.URL
 
 import co.ifwe.antelope.Event
 
-
+/**
+ * The CachedEventConfiguration provides high-performance access to input EventHistory
+ * By merging multiple data sources and by serializing events in the efficient
+ * Kryo format it makes practical interactive replay even for data sets with millions
+ * of input events.
+ */
 trait CachedEventConfiguration extends EventConfiguration {
   def storage(): KryoEventStorage
   def cacheDir(): String
