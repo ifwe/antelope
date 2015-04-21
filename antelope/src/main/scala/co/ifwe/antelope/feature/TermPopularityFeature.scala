@@ -3,6 +3,15 @@ package co.ifwe.antelope.feature
 import co.ifwe.antelope._
 import co.ifwe.antelope.util._
 
+/**
+ * Term popularity gives the frequency with which the selected document
+ * and query term co-occur.
+ *
+ * @param ide
+ * @param t
+ * @param s
+ * @tparam T context type in which we will be scoring this feature
+ */
 class TermPopularityFeature[T <: ProductSearchScoringContext](ide: IdExtractor, t: Terms)(implicit val s: State[T])
   extends Feature[ProductSearchScoringContext] {
 

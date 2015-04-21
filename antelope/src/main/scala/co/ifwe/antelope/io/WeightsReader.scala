@@ -4,6 +4,10 @@ import java.net.URL
 
 import scala.io.Source
 
+/**
+ * WeightsReader reads a comma-separated list of parameters from a text file.
+ * This is used for reading fit parameters saved from R.
+ */
 object WeightsReader {
   def getWeights(url: URL): Array[Double] = {
     Source.fromURL(url,"UTF-8").getLines().take(1).toList.headOption match {
@@ -13,7 +17,7 @@ object WeightsReader {
         } else {
           w.toDouble
         }
-      }.toArray
+      }
       case None => Array[Double]()
     }
   }

@@ -5,6 +5,12 @@ import java.io._
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.util.{CustomIterator, Digest}
 
+/**
+  * Cache management code
+  *
+  * @param cacheDir
+  * @param storage
+  */
 class CachedEvents(cacheDir: String, storage: EventStorage) {
   def apply[T<:Event](identifier: String, events: () => Iterable[T]): Iterable[T] = {
     val idHash = Digest.sha1(identifier)
