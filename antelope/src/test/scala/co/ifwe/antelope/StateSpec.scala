@@ -138,7 +138,7 @@ class StateSpec extends FlatSpec {
 
   it should "create a simple smoothed counter" in {
     val st = new State[ScoringContext]
-    val spc = st.smoothedCounter(defUpdate {
+    val spc = st.decayingCounter(defUpdate {
       case e: TestEvent => (e.id, e.ts)
     }, Math.log(2D)/1000D)
 

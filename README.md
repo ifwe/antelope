@@ -5,10 +5,12 @@
 # Antelope Realtime Events #
 
 The *Antelope Realtime Events* project aims to make iterative and agile machine learning
-a practical reality in realtime applications.  It derives from a proprietary framework used 
-by [if(we)](http://www.ifwe.co/) to develop recommendation engines.  By unifying the software
-that data scientists use to extract data for training a machine learning model with the software 
-used to run that model in production, a much faster progress cycle becomes possible.
+a practical reality, especially in systems that must respond immediately to new
+circumstances.  It derives from a proprietary framework used by
+[if(we)](http://www.ifwe.co/) to develop recommendation engines for our social products.
+By unifying the software that data scientists use to extract data for training a
+machine learning model with the software used to run that model in production, a much
+faster progress cycle becomes possible.
 
 ## What's new in v0.2 ##
 
@@ -22,6 +24,8 @@ Updates in v0.2 include:
 * Cached events - this performance improvement saves events to a cache using binary
   serialization. Eliminating input parsing and merging overheads speeds up development
   cycles and makes practical larger data sets.
+* Expanded feature types - we introduce a greater variety of features as well as 
+  [feature engineering documentation](doc/features.md).
 
 We encourage you to explore the framework and to run the demos, but please understand
 that production needs have not been yet provided for. Among other things, the in-memory
@@ -42,6 +46,14 @@ Please see the [Getting Started with the Demo](doc/demo.md) documentation and
 follow the instructions to download the data and to go through a simple machine
 learning exercise. To see this demonstration embedded in a working web application
 check out instructions at [Running the Web Demo](doc/demo-web.md).
+
+## Language for feature engineering
+
+Antelope aims to provide an expressive DSL-like experience for shaping raw streams of
+input events into the signals or features directly useful to machine learning. Our
+guiding principle is that concepts that are easy to explain should be easy to implement.
+Please see the [feature engineering](doc/features.md) documentation for further
+descriptions and examples.
 
 ## Applicability
 
