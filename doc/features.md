@@ -21,7 +21,7 @@ Scoring is done with simple normalization
 
 reflecting the fraction of all events occurring with the specified id.
 
-Source: [OverallPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/OverallPopularityFeature.scala)
+Source: [OverallPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/feature/OverallPopularityFeature.scala)
 
 ## Recent popularity ##
 
@@ -39,7 +39,7 @@ represented in the query context
 
     id: Long => ct(ctx.t, id) div ct(ctx.t)
 
-Source: [RecentPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/RecentPopularityFeature.scala)
+Source: [RecentPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/feature/RecentPopularityFeature.scala)
 
 ## Term popularity ##
 
@@ -47,7 +47,7 @@ Direct measure of the frequency of the document given the term. In our implement
 we make use of a hierarchical counter state variable that allows us to get the count
 at each level.
 
-Source: [TermPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/TermPopularityFeature.scala)
+Source: [TermPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/feature/TermPopularityFeature.scala)
 
 ## Naive Bayes popularity ##
 
@@ -55,10 +55,10 @@ One could argue that this is more principled than the related term popularity
 implementation, yet Naive Bayes is usually applied in situations where its
 theoretical justifications do not apply.
 
-Source: [NaiveBayesPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/NaiveBayesPopularityFeature.scala)
+Source: [NaiveBayesPopularityFeature](../antelope/src/main/scala/co/ifwe/antelope/feature/NaiveBayesPopularityFeature.scala)
 
 ## TF-IDF ##
 
 Term frequency-inverse document frequency as is standard in information retrieval.
 
-Source: [TfIdfFeature](../antelope/src/main/scala/co/ifwe/antelope/TfIdfFeature.scala)
+Source: [TfIdfFeature](../antelope/src/main/scala/co/ifwe/antelope/feature/TfIdfFeature.scala)
