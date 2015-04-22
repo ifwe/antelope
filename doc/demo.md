@@ -19,8 +19,10 @@ Should you have any issues please reach out at our [Google Group](https://groups
 
     export ANTELOPE_DATA=$ANTELOPE_DEMO/data
     export ANTELOPE_TRAINING=$ANTELOPE_DEMO/training
+    export ANTELOPE_CACHE=/tmp/antelope
     mkdir $ANTELOPE_DATA
     mkdir $ANTELOPE_TRAINING
+    mkdir $ANTELOPE_CACHE
 
 ### Grab the Antelope source code from Github
 
@@ -52,7 +54,7 @@ You will now use Antelope to generate training data
 
 Within sbt execute the following commands to generate training data
 
-    project demo
+    project demo-best-buy
     runMain co.ifwe.antelope.bestbuy.exec.LearnedRankerTraining
 
 Now you should have training data in a file.  You can have a quick look at it
@@ -71,7 +73,11 @@ section.  This demo ships with effective model parameters.
 
 Your coefficients should look like the following
 
+<<<<<<< HEAD
     88.77053,2437.086,0.1170896,7670.614,-0.02810121
+=======
+    59.3188,42.97628,0.1188885,-0.01602002,1.371848,0.1308245
+>>>>>>> 84f65b5... update demo documentation
 
 You can verify that these are hardcoded in the class
 [co.ifwe.antelope.bestbuy.exec.LearnedRankerScoring](../demo/src/main/scala/co/ifwe/antelope/bestbuy/exec/LearnedRankerScoring.scala).
@@ -90,9 +96,19 @@ You should see something like the following final output
     progress 39000
     progress 39500
     progress 40000
-    co.ifwe.antelope.bestbuy.model.BestBuyModel@65851435 finishing with stats: 8472/10000 hits for 84.7%
-    completed 40000 in 17337 ms, rate of 2307/s
-    [success] Total time: 20 s, completed Feb 25, 2015 1:23:22 PM
+    co.ifwe.antelope.bestbuy.model.BestBuyModel@44ff1bb3 finishing with stats: 8399/10000 hits for 84.0%
+    correction types
+    extra space: 94
+    missingSpace: 39
+    extraLetters: 9
+    missingLetters: 8
+    changeLetters: 6
+    transposeLetters: 0
+    total correctable: 156
+    total missed 3202
+    ()
+    completed 40000 in 17469 ms, rate of 2289/s
+    [success] Total time: 19 s, completed Apr 21, 2015 9:30:39 PM
 
 That's it, you've successfully trained and scored a model!  In this case the hit percentage represents the
 fraction of rankings that contain the product viewed by the user within the first top 5 results.

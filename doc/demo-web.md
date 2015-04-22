@@ -3,8 +3,11 @@
 This is the right place to see Antelope in action in a simple web application.
 
 ## Setup ##
-As a prerequisite, please be sure to complete the steps in Getting Started
-section titled [Download necessary files](demo.md#download-necessary-files).
+As a prerequisite, please be sure to complete the steps in
+section titled [Download necessary files](demo.md#download-necessary-files)
+from the document [Getting Started with the Best Buy Demo](demo.md). These
+instructions will guide you through downloading data files and configuring
+environment variables.
 
 ## Running the web demo ##
 
