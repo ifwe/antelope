@@ -1,4 +1,4 @@
-# Getting Started with the Demo #
+# Getting Started with the Best Buy Demo #
 
 You've arrived in the right place!  The best way to understand what Antelope does is probably just
 to give it a quick try.  This project contains ships with demo code that works with the
