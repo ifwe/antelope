@@ -2,4 +2,4 @@ package co.ifwe.antelope.datingdemo
 
 import co.ifwe.antelope.Event
 
-class QueryEvent (val ts: Long, id: Long, suggestedId: Long) extends Event
+case class QueryEvent (ts: Long, id: Long, val suggestedId: Long, vote: Boolean) extends Event

@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 object Simulation extends App {
   val startTime = 1000000L
-//  val endTime = 10000000L
+//  val endTime = 1100000L
   val endTime = 10000000L
   val printInterval = 100000L
   var t = startTime
@@ -43,9 +43,14 @@ object Simulation extends App {
   }
 
   val activityRandom = new BetaRandom(rnd, 2.5, 1.5)
+  val selectivityRandom = new BetaRandom(rnd, 1.5, 2.5)
 
   class UserGenerator {
-    val newUserRate = .01
+    def newUserRate = if (t < 2000000) {
+      0.01
+    } else {
+      0.001
+    }
     def nextUser(): User = {
       val u = new User(
         new UserProfile(
@@ -54,7 +59,8 @@ object Simulation extends App {
           age = ageRandom.next(),
           region = randomRegion.next()
         ),
-        activity = activityRandom.next()
+        activity = activityRandom.next(),
+        selectivity = selectivityRandom.next()
       )
       nextUserId += 1
       u
@@ -67,7 +73,7 @@ object Simulation extends App {
       Simulation.this.queue(t, () => {
         val u = nextUser()
         registerNext()
-        Some(new NewUserEvent(t, u.profile))
+        Some(new NewUserEvent(t, u))
       })
     }
     queue(t)
@@ -94,30 +100,48 @@ object Simulation extends App {
     }
   }
 
-  val profiles = mutable.ArrayBuffer[UserProfile]()
+  val profiles = mutable.ArrayBuffer[User]()
 
   var queryCt = 0
-  def getRecommendation(id: Long): UserProfile = {
+  var queryLikeCt = 0
+  def getRecommendation(id: Long): User = {
     // randomly selected
-    queryCt += 1
     profiles(rnd.nextInt(profiles.length))
   }
 
+  def updateQueryStats(qe: QueryEvent): Unit = {
+    queryCt += 1
+    if (qe.vote) {
+      queryLikeCt += 1
+    }
+  }
+
+  var responseCt = 0
+  var responseLikeCt = 0
+  def updateResponseStats(re: ResponseEvent): Unit = {
+    responseCt += 1
+    if (re.vote) {
+      responseLikeCt += 1
+    }
+  }
+
   def status(): Option[Event] = {
-    println(s"$t ${profiles.length} $queryCt ${q.length}")
+    println(s"$t ${profiles.length} $queryCt $queryLikeCt $responseCt $responseLikeCt ${q.length}")
     queue(t + printInterval, status)
     None
   }
   queue(t + printInterval, status)
 
   new UserGenerator()
-  while (t < endTime && !q.isEmpty) {
+  while (t <= endTime && !q.isEmpty) {
     val nextExec = q.dequeue()
     t = nextExec.t
     nextExec.f() match {
       case Some(e) =>
         e match {
-          case nue: NewUserEvent => profiles += nue.profile
+          case nue: NewUserEvent => profiles += nue.user
+          case qe: QueryEvent => updateQueryStats(qe)
+          case re: ResponseEvent => updateResponseStats(re)
           case _ =>
         }
 //        println(e)
