@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="images/antelope-logo-1.png?raw=true" alt="Antelope Realtime Events logo"/>
+</p>
+
 # Antelope Realtime Events #
 
 The *Antelope Realtime Events* project aims to make iterative and agile machine learning
