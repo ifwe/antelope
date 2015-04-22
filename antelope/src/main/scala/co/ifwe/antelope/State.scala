@@ -103,7 +103,7 @@ class State[T <: ScoringContext] {
     s
   }
 
-  def registerSmoothedCounter[T <: SmoothedCounter](s: T): T = {
+  def registerDecayingCounter[T <: SmoothedCounter](s: T): T = {
     smoothedCounters += s
     s
   }
@@ -293,8 +293,8 @@ class State[T <: ScoringContext] {
     })
   }
 
-  def smoothedCounter[T1](d: IterableUpdateDefinition[(T1,Long)], smoothing: Double): SmoothedCounter1[T1] = {
-    registerSmoothedCounter(new SmoothedCounter1[T1] {
+  def decayingCounter[T1](d: IterableUpdateDefinition[(T1,Long)], smoothing: Double): SmoothedCounter1[T1] = {
+    registerDecayingCounter(new SmoothedCounter1[T1] {
       class ExpCt {
         var lastT: Long = 0L
         var sum: Double = 0D
