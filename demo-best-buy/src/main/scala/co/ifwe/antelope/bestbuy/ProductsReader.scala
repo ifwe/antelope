@@ -20,7 +20,7 @@ object ProductsReader {
       val ts = (x \ "startDate" text)
       val sku = (x \ "sku" text)
       val name = (x \ "name" text)
-      val description = (x \ "longDescription" text)
+      val description = (x \ "longDescription" text).stripPrefix("Synopsis")
       val categories = (x \\ "category" \ "name").map(_.text).toArray
       new ProductUpdate(IOUtil.getProductDate(ts), sku.toLong, name, description, categories)
     }

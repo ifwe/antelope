@@ -18,7 +18,8 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
 
   protected implicit val jsonFormats: Formats = DefaultFormats.withBigDecimal
 
-  // TODO lots of duplication to remove here
+  // TODO lots of duplication to remove here, should share code with
+  // co.ifwe.antelope.bestbuy.EventProcessing
   val dataDir = System.getenv("ANTELOPE_DATA")
   if (dataDir == null || dataDir.isEmpty) {
     throw new IllegalArgumentException("must set $ANTELOPE_DATA environment variable")
@@ -28,7 +29,7 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
     throw new IllegalArgumentException("must set $ANTELOPE_TRAINING environment variable")
   }
 
-  val viewsFn = dataDir + File.separator + "train.csv"
+  val viewsFn = dataDir + File.separator + "train_sorted.csv"
   val productsFn = dataDir + File.separator + "small_product_data.xml"
 
   val catalog = mutable.HashMap[Long, ProductUpdate]()
