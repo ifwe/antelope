@@ -6,10 +6,23 @@ by [if(we)](http://www.ifwe.co/) to develop recommendation engines.  By unifying
 that data scientists use to extract data for training a machine learning model with the software 
 used to run that model in production, a much faster progress cycle becomes possible.
 
-This is a v0.1 release!  It is backed by a toy in-memory state implementation, the API is
-incomplete, and it's subject to radical change.  We encourage you to explore the framework
-and demo code, but please understand that
-it is not ready for practical use of any sort.
+## What's new in v0.2 ##
+
+This remains a demonstration release designed to expose the API and programming style.
+
+Updates in v0.2 include:
+* Spell correction in product search demo - we found that the most apparent cause of 
+  recommendation errors in the demo was spelling mistakes.
+* [Web demo](doc/demo-web.md) - front-end for the product search demo so you can
+  interact with the product directly
+* Cached events - this performance improvement saves events to a cache using binary
+  serialization. Eliminating input parsing and merging overheads speeds up development
+  cycles and makes practical larger data sets.
+
+We encourage you to explore the framework and to run the demos, but please understand
+that production needs have not been yet provided for. Among other things, the in-memory
+state representation uses JVM objects whereas our production implementation uses
+packed arrays, an optimization that allows for larger models and practical checkpoints.
 
 We're releasing Antelope now because we want your feedback!  Please join the
 [Google Group](https://groups.google.com/forum/#!forum/antelope-rte) and please
@@ -94,7 +107,7 @@ you should be well on your way.
 
 -----
 
-README.md: Copyright 2014 Ifwe Inc.
+README.md: Copyright 2015 Ifwe Inc.
 
 README.md is licensed under a Creative Commons Attribution-ShareAlike 4.0
 International License.
