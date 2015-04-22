@@ -69,4 +69,13 @@ object PredictBuild extends Build {
     )
   ) dependsOn(demo)
 
+  lazy val demodating = Project("demo-dating-simulation", file("demo-dating-simulation"),
+    settings = buildSettings ++ Seq (
+      name := "demodating",
+      libraryDependencies := libraryDependencies.value ++ Seq(
+        "org.apache.commons" % "commons-math3" % "3.5"
+      )
+    )
+  ) dependsOn(antelope)
+
 }
