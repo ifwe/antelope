@@ -1,6 +1,8 @@
 package co.ifwe.antelope.feature
 
 import co.ifwe.antelope._
+import co.ifwe.antelope.util._
+
 
 /**
  * Naive Bayes assumes independence between terms from the query context, an
