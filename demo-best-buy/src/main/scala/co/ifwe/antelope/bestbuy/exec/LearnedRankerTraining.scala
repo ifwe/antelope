@@ -48,13 +48,13 @@ object LearnedRankerTraining extends App with EventProcessing {
             trainingWriter.write(new TrainingExample(outcome, m.featureNames zip m.featureValues(ctx, docId)))
           }
 
-            viewCt += 1
-            if (viewCt > TRAINING_START) {
-              // Generate training data
-              printTrainingResult(pv.skuSelected, true)
-              val randomDoc = getRandomDoc()
-              printTrainingResult(randomDoc, randomDoc == pv.skuSelected)
-            }
+          viewCt += 1
+          if (viewCt > TRAINING_START) {
+            // Generate training data
+            printTrainingResult(pv.skuSelected, true)
+            val randomDoc = getRandomDoc()
+            printTrainingResult(randomDoc, randomDoc == pv.skuSelected)
+          }
         case _ =>
       }
       super.consume(e)
