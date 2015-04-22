@@ -32,6 +32,17 @@ We're releasing Antelope now because we want your feedback!  Please join the
 [Google Group](https://groups.google.com/forum/#!forum/antelope-rte) and please
 don't hesitate to post your questions, suggestions, or ideas.
 
+## Running the Kaggle Demo
+
+Perhaps the best way to understand what Antelope does is by giving it a quick try.
+This project contains examples that work with the 
+[ACM SF Chapter's Best Buy data set](https://www.kaggle.com/c/acm-sf-chapter-hackathon-small).
+
+Please see the [Getting Started with the Demo](doc/demo.md) documentation and
+follow the instructions to download the data and to go through a simple machine
+learning exercise. To see this demonstration embedded in a working web application
+check out instructions at [Running the Web Demo](doc/demo-web.md).
+
 ## Applicability
 
 ### What Antelope does (or will do... eventually)
@@ -49,17 +60,6 @@ don't hesitate to post your questions, suggestions, or ideas.
 * Train machine learning models - there are plenty of implementations for those
 * Collect or store event logs - integrate with Kafka, Hadoop, or related technologies
 * Store model state - we build on databases and stream processing frameworks
-
-## Running the Kaggle Demo
-
-Perhaps the best way to understand what Antelope does is by giving it a quick try.
-This project contains examples that work with the 
-[ACM SF Chapter's Best Buy data set](https://www.kaggle.com/c/acm-sf-chapter-hackathon-small).
-
-Please see the [Getting Started with the Demo](doc/demo.md) documentation and
-follow the instructions to download the data and to go through a simple machine
-learning exercise. To see this demonstration embedded in a working web application
-check out instructions at [Running the Web Demo](doc/demo-web.md).
 
 ## Frequently Asked Questions
 
