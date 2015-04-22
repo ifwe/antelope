@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/antelope-logo-1.png?raw=true" alt="Antelope Realtime Events logo"/>
+  <img src="doc/images/antelope-logo-1.png?raw=true" alt="Antelope Realtime Events logo"/>
 </p>
 
 # Antelope Realtime Events #
