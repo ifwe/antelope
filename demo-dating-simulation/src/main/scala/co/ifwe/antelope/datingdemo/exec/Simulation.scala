@@ -1,7 +1,10 @@
-package co.ifwe.antelope.datingdemo
+package co.ifwe.antelope.datingdemo.exec
 
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.Region._
+import co.ifwe.antelope.datingdemo.event.{NewUserEvent, QueryEvent, ResponseEvent}
+import co.ifwe.antelope.datingdemo.gen.{RegionRandom, RandomDistribution, BetaRandom, MapWeightedRandom}
+import co.ifwe.antelope.datingdemo.{User, UserProfile}
 import org.apache.commons.math3.random.MersenneTwister
 
 import scala.collection.mutable

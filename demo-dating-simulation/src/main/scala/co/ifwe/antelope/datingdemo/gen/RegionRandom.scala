@@ -1,6 +1,7 @@
-package co.ifwe.antelope.datingdemo
+package co.ifwe.antelope.datingdemo.gen
 
-import Region.Region
+import co.ifwe.antelope.datingdemo.Region
+import co.ifwe.antelope.datingdemo.Region._
 import org.apache.commons.math3.random.RandomGenerator
 
 class RegionRandom(val rnd: RandomGenerator) {

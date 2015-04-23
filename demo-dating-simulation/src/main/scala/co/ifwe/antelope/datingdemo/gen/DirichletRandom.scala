@@ -1,4 +1,4 @@
-package co.ifwe.antelope.datingdemo
+package co.ifwe.antelope.datingdemo.gen
 
 import org.apache.commons.math3.distribution.GammaDistribution
 import org.apache.commons.math3.random.RandomGenerator

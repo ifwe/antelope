@@ -4,6 +4,8 @@ import java.security.MessageDigest
 import java.nio.ByteBuffer
 
 import co.ifwe.antelope.Event
+import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent}
+import co.ifwe.antelope.datingdemo.exec.Simulation
 
 class User(val profile: UserProfile,
            private var activity: Double,
