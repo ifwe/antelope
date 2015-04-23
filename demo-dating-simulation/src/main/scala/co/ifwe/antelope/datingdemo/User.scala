@@ -23,6 +23,8 @@ class User(val profile: UserProfile,
 
   val previousResponses = mutable.HashSet[Long]()
 
+  val inboundRate = new SmoothedRate(.00001 * math.log(2))
+
   def combineDouble(id1: Long, id2: Long, extra: Long) = {
     val bytes = new Array[Byte](24)
     val longs = ByteBuffer.wrap(bytes).asLongBuffer()
@@ -50,13 +52,29 @@ class User(val profile: UserProfile,
   }
 
   private def evaluateLike(user: User): Option[Event] = {
-    if (previousResponses.contains(user.profile.id)) {
-      None
+    if (inboundRate.getRate(s.t) < 10D) {
+      inboundRate.add(s.t)
+      if (previousResponses.contains(user.profile.id)) {
+        // No response if we've seen the user before
+        None
+      } else {
+        previousResponses += user.profile.id
+        val vote = likes(user)
+        user.activityTransform(0.12)
+        this.activityTransform(0.06)
+        Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
+      }
     } else {
-      previousResponses += user.profile.id
-      val vote = likes(user)
-      Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
+      None
     }
+  }
+
+  private def activityTransform(delta: Double): Unit = {
+    activity = transform(activity, delta)
+  }
+
+  private def transform(x: Double, delta: Double): Double = {
+    1D / (1D + math.exp(-(math.log(x/(1-x)) + delta)))
   }
 
   private def queueEvaluateLike(user: User): Unit = {
@@ -64,7 +82,8 @@ class User(val profile: UserProfile,
     if (evaluateTs - s.t < MAX_RESPONSE_DELAY) {
       s.enqueue(evaluateTs, () => evaluateLike(user))
     }
-    // TODO decrement activity on both
+    this.activityTransform(-0.1)
+    user.activityTransform(-0.05)
   }
 
   private def act(): Option[Event] = {
