@@ -82,10 +82,24 @@ class State[T <: ScoringContext] {
     def toMap(t: Long): Map[T1, Double]
   }
 
+
+  trait MapBase {
+    def put: PartialFunction[Event, Unit]
+  }
+
+  trait Map0[K,V] extends MapBase {
+    def get(k: K): Option[V]
+  }
+
+  trait MapN[K,V] extends MapBase {
+    def get(k: K): List[V]
+  }
+
   val counters = mutable.ArrayBuffer[Counter]()
   val sets = mutable.ArrayBuffer[Set]()
   val sums = mutable.ArrayBuffer[Sum]()
   val smoothedCounters = mutable.ArrayBuffer[SmoothedCounter]()
+  val maps = mutable.ArrayBuffer[MapBase]()
   val features = mutable.ArrayBuffer[Feature[T]]()
 
   def registerCounter[T <: Counter](c: T): T = {
@@ -106,6 +120,11 @@ class State[T <: ScoringContext] {
   def registerDecayingCounter[T <: SmoothedCounter](s: T): T = {
     smoothedCounters += s
     s
+  }
+
+  def registerMap[T <: MapBase](m: T): T = {
+    maps += m
+    m
   }
 
   def incr[T](m: mutable.HashMap[T,Long], k: T): Unit = {
@@ -396,6 +415,41 @@ class State[T <: ScoringContext] {
     })
   }
 
+  def map[K,V](k: SimpleUpdateDefinition[K], v: SimpleUpdateDefinition[V]): Map0[K,V] = {
+    registerMap(new Map0[K,V] {
+      val m = mutable.HashMap[K,V]()
+      override def put = new PartialFunction[Event, Unit] {
+        override def isDefinedAt(x: Event): Boolean = k.getFunction.isDefinedAt(x) && v.getFunction.isDefinedAt(x)
+
+        override def apply(x: Event): Unit = m.put(k.getFunction(x), v.getFunction(x))
+      }
+      def get(k: K) = m.get(k)
+    })
+  }
+
+  def lastNMap[K,V](k: SimpleUpdateDefinition[K], v: SimpleUpdateDefinition[V], limit: Int): MapN[K,V] = {
+    registerMap(new MapN[K,V] {
+      val m = mutable.HashMap[K,List[V]]()
+      override def put = new PartialFunction[Event, Unit] {
+        override def isDefinedAt(x: Event): Boolean = k.getFunction.isDefinedAt(x) && v.getFunction.isDefinedAt(x)
+
+        override def apply(x: Event): Unit = {
+          val key = k.getFunction(x)
+          val addVal = v.getFunction(x)
+          if (m.contains(key)) {
+            m.put(key, (addVal :: m(key)).take(limit))
+          } else {
+            m.put(key, List(addVal))
+          }
+        }
+      }
+      def get(k: K) = m.get(k) match {
+        case Some(x) => x
+        case None => List()
+      }
+    })
+  }
+
   def feature[U <: T](f: Feature[U]): Unit = {
     features += f.asInstanceOf[Feature[T]]
   }
@@ -412,6 +466,9 @@ class State[T <: ScoringContext] {
     }
     for (e <- events; s <- smoothedCounters) {
       (s.increment orElse defUpdate{ case _ => }.getFunction)(e)
+    }
+    for (e <- events; s <- maps) {
+      (s.put orElse defUpdate {case _ => }.getFunction)(e)
     }
   }
 

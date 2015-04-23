@@ -1,7 +1,6 @@
 package co.ifwe.antelope.datingdemo.event
 
-class ResponseEvent (ts: Long,
-                     id: Long,
-                     otherId: Long,
-                     vote: Boolean)
-  extends VoteEvent (ts, id, otherId, vote)
+case class ResponseEvent (val ts: Long,
+    val id: Long,
+    val otherId: Long,
+    val vote: Boolean) extends VoteEvent

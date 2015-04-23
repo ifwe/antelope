@@ -1,7 +1,10 @@
 package co.ifwe.antelope.datingdemo.event
 
-class QueryEvent (ts: Long,
-                     id: Long,
-                     otherId: Long,
-                     vote: Boolean)
-  extends VoteEvent (ts, id, otherId, vote)
+import co.ifwe.antelope.datingdemo.DatingScoringContext
+
+class QueryEvent (val ctx: DatingScoringContext, recommendedId: Long, val vote: Boolean)
+  extends VoteEvent {
+  override val ts = ctx.t
+  override val id = ctx.user.profile.id
+  override val otherId = recommendedId
+}

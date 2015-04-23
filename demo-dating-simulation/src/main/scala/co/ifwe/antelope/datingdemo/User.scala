@@ -7,25 +7,22 @@ import collection.mutable
 
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent}
-import co.ifwe.antelope.datingdemo.exec.Simulation
 import co.ifwe.antelope.datingdemo.gen.SimulationContext
 
 class User(val profile: UserProfile,
            private var activity: Double,
-           private val selectivity: Double,
-           private val regionAffinity: Array[Double])(implicit s: SimulationContext) {
+           selectivity: Double,
+           regionAffinity: Array[Double])(implicit s: SimulationContext) {
 
-//  println(s"""${profile.region} ${regionAffinity.mkString(",")}""")
+  private val MAX_RESPONSE_DELAY = 1000000
 
-  val MAX_RESPONSE_DELAY = 1000000
+  private val DOUBLE_UNIT = 1.0 / (1L << 53)
 
-  val DOUBLE_UNIT = 1.0 / (1L << 53)
+  private val previousResponses = mutable.HashSet[Long]()
 
-  val previousResponses = mutable.HashSet[Long]()
+  private val inboundRate = new SmoothedRate(.00001 * math.log(2))
 
-  val inboundRate = new SmoothedRate(.00001 * math.log(2))
-
-  def combineDouble(id1: Long, id2: Long, extra: Long) = {
+  private def combineDouble(id1: Long, id2: Long, extra: Long) = {
     val bytes = new Array[Byte](24)
     val longs = ByteBuffer.wrap(bytes).asLongBuffer()
     longs.put(0, id1)
@@ -40,7 +37,7 @@ class User(val profile: UserProfile,
   }
 //  res4: Long = 4222319432995412684
 
-  def likes(other: User): Boolean = {
+  private def likes(other: User): Boolean = {
     // We limit this simulation to straight profiles to keep things simple
     if (profile.gender != other.profile.gender
       && combineDouble(profile.id, other.profile.id,7930283810011048737L) < selectivity
@@ -87,16 +84,17 @@ class User(val profile: UserProfile,
   }
 
   private def act(): Option[Event] = {
-    val recommendation = Simulation.getRecommendation(profile.id)
+    val queryContext = new DatingScoringContext(s.t, this)
+    val recommendation = s.getRecommendationSource.getRecommendation(queryContext)
     val vote = likes(recommendation)
     if (vote) {
       recommendation.queueEvaluateLike(this)
     }
-    schedule()
-    Some(new QueryEvent(s.t, profile.id, recommendation.profile.id, vote))
+    scheduleNextActivity()
+    Some(new QueryEvent(queryContext, recommendation.profile.id, vote))
   }
 
-  private def schedule() = s.enqueue(s.nextEventTime(activity * .0001D), act)
-  schedule()
+  private def scheduleNextActivity() = s.enqueue(s.nextEventTime(activity * .0001D), act)
+  scheduleNextActivity()
 
 }

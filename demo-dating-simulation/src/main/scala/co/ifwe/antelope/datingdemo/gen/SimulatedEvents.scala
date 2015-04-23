@@ -3,13 +3,14 @@ package co.ifwe.antelope.datingdemo.gen
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.Region._
 import co.ifwe.antelope.datingdemo.event.NewUserEvent
+import co.ifwe.antelope.datingdemo.model.RecommendationSource
 import co.ifwe.antelope.datingdemo.{Gender, User, UserProfile}
 import co.ifwe.antelope.util.CustomIterator
 import org.apache.commons.math3.random.RandomGenerator
 
 import scala.collection.mutable
 
-class SimulatedEvents(rnd: RandomGenerator) extends Iterable[Event] {
+class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource) extends Iterable[Event] {
 
   class SimulationRunnable(val t: Long,
                             val f: () => Option[Event])
@@ -40,7 +41,7 @@ class SimulatedEvents(rnd: RandomGenerator) extends Iterable[Event] {
     override def init(): Unit = {
       q = new mutable.PriorityQueue[SimulationRunnable]()
 
-      implicit val sc = new SimulationContext() {
+      implicit val sc = new SimulationContext {
         override def t: Long = currentTime
         override def nextEventTime(k: Double): Long = {
           t + (-Math.log1p(-rnd.nextDouble())/k).toLong
@@ -48,6 +49,7 @@ class SimulatedEvents(rnd: RandomGenerator) extends Iterable[Event] {
         override def enqueue(t: Long, f: () => Option[Event]): Unit = {
           q += new SimulationRunnable(t, f)
         }
+        override def getRecommendationSource: RecommendationSource = rs
       }
 
       var nextUserId = 1
