@@ -11,7 +11,7 @@ import scala.util.Random
 
 object Simulation extends App {
   val profiles = mutable.ArrayBuffer[User]()
-  val rnd = new Random()
+  val rnd = new Random(9234809)
   var queryCt = 0
   var queryLikeCt = 0
 

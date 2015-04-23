@@ -31,7 +31,7 @@ class SimulatedEvents(rnd: RandomGenerator) extends Iterable[Event] {
   override def iterator: Iterator[Event] = new CustomIterator[Event] {
     val startTime = 1000000L
     //  val endTime = 1100000L
-    val endTime = 10000000L
+    val endTime = 2000000L
     val printInterval = 100000L
     var currentTime = startTime
 
