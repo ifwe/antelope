@@ -44,6 +44,7 @@ object Simulation extends App {
 
   val activityRandom = new BetaRandom(rnd, 2.5, 1.5)
   val selectivityRandom = new BetaRandom(rnd, 1.5, 2.5)
+  val regionAffinityRandom = new RegionRandom(rnd)
 
   class UserGenerator {
     def newUserRate = if (t < 2000000) {
@@ -52,15 +53,17 @@ object Simulation extends App {
       0.001
     }
     def nextUser(): User = {
+      val p = new UserProfile(
+        id = nextUserId,
+        gender = Gender(rnd.nextInt(2)),
+        age = ageRandom.next(),
+        region = randomRegion.next()
+      )
       val u = new User(
-        new UserProfile(
-          id = nextUserId,
-          gender = Gender(rnd.nextInt(2)),
-          age = ageRandom.next(),
-          region = randomRegion.next()
-        ),
+        profile = p,
         activity = activityRandom.next(),
-        selectivity = selectivityRandom.next()
+        selectivity = selectivityRandom.next(),
+        regionAffinity = regionAffinityRandom.next(p.region)
       )
       nextUserId += 1
       u

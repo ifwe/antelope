@@ -7,7 +7,10 @@ import co.ifwe.antelope.Event
 
 class User(val profile: UserProfile,
            private var activity: Double,
-           private val selectivity: Double) {
+           private val selectivity: Double,
+           private val regionAffinity: Array[Double]) {
+
+//  println(s"""${profile.region} ${regionAffinity.mkString(",")}""")
 
   val MAX_RESPONSE_DELAY = 1000000
 
@@ -26,14 +29,14 @@ class User(val profile: UserProfile,
     val low = (resInts.get(1) & 0x07ffffff).toLong
     (high | low) * DOUBLE_UNIT
   }
-//  res3: Long = 5511114762692428345
 //  res4: Long = 4222319432995412684
 
   def likes(other: User): Boolean = {
     // We limit this simulation to straight profiles to keep things simple
-    if (profile.gender != other.profile.gender) {
-      combineDouble(profile.id, other.profile.id,7930283810011048737L) < selectivity
-      // TODO come up with a model incorporating age, region, etc.
+    if (profile.gender != other.profile.gender
+      && combineDouble(profile.id, other.profile.id,7930283810011048737L) < selectivity
+      && combineDouble(profile.id, other.profile.id,5511114762692428345L) < regionAffinity(other.profile.region.##)) {
+      true
     } else {
       false
     }
