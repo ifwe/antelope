@@ -3,6 +3,8 @@ package co.ifwe.antelope.datingdemo
 import java.security.MessageDigest
 import java.nio.ByteBuffer
 
+import collection.mutable
+
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent}
 import co.ifwe.antelope.datingdemo.exec.Simulation
@@ -18,6 +20,8 @@ class User(val profile: UserProfile,
   val MAX_RESPONSE_DELAY = 1000000
 
   val DOUBLE_UNIT = 1.0 / (1L << 53)
+
+  val previousResponses = mutable.HashSet[Long]()
 
   def combineDouble(id1: Long, id2: Long, extra: Long) = {
     val bytes = new Array[Byte](24)
@@ -46,8 +50,13 @@ class User(val profile: UserProfile,
   }
 
   private def evaluateLike(user: User): Option[Event] = {
-    val vote = likes(user)
-    Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
+    if (previousResponses.contains(user.profile.id)) {
+      None
+    } else {
+      previousResponses += user.profile.id
+      val vote = likes(user)
+      Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
+    }
   }
 
   private def queueEvaluateLike(user: User): Unit = {
