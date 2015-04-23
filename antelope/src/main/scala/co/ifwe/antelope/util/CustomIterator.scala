@@ -10,20 +10,28 @@ package co.ifwe.antelope.util
  */
 abstract class CustomIterator[T] extends Iterator[T] {
 
-  def init(): Unit = { }
+  def init(): Unit = {}
+
   def advance(): T
 
   init()
-  var nextRet: T = advance()
+  private var nextLoaded = false
+  private var nextRet: T = _
 
-  override def hasNext: Boolean = nextRet != null
+  override def hasNext: Boolean = {
+    if (!nextLoaded) {
+      nextRet = advance()
+      nextLoaded = true
+    }
+    nextRet != null
+  }
 
   override def next(): T = {
-    if (nextRet == null) {
-      throw new IllegalStateException()
+    if (!nextLoaded) {
+      advance()
+    } else {
+      nextLoaded = false
+      nextRet
     }
-    val ret = nextRet
-    nextRet = advance()
-    ret
   }
 }

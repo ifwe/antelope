@@ -6,11 +6,12 @@ import java.nio.ByteBuffer
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent}
 import co.ifwe.antelope.datingdemo.exec.Simulation
+import co.ifwe.antelope.datingdemo.gen.SimulationContext
 
 class User(val profile: UserProfile,
            private var activity: Double,
            private val selectivity: Double,
-           private val regionAffinity: Array[Double]) {
+           private val regionAffinity: Array[Double])(implicit s: SimulationContext) {
 
 //  println(s"""${profile.region} ${regionAffinity.mkString(",")}""")
 
@@ -46,13 +47,13 @@ class User(val profile: UserProfile,
 
   private def evaluateLike(user: User): Option[Event] = {
     val vote = likes(user)
-    Some(new ResponseEvent(Simulation.t, profile.id, user.profile.id, vote))
+    Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
   }
 
   private def queueEvaluateLike(user: User): Unit = {
-    val evaluateTs = Simulation.nextEventTime(activity * .0001D)
-    if (evaluateTs - Simulation.t < MAX_RESPONSE_DELAY) {
-      Simulation.queue(evaluateTs, () => evaluateLike(user))
+    val evaluateTs = s.nextEventTime(activity * .0001D)
+    if (evaluateTs - s.t < MAX_RESPONSE_DELAY) {
+      s.enqueue(evaluateTs, () => evaluateLike(user))
     }
     // TODO decrement activity on both
   }
@@ -64,10 +65,10 @@ class User(val profile: UserProfile,
       recommendation.queueEvaluateLike(this)
     }
     schedule()
-    Some(new QueryEvent(Simulation.t, profile.id, recommendation.profile.id, vote))
+    Some(new QueryEvent(s.t, profile.id, recommendation.profile.id, vote))
   }
 
-  private def schedule() = Simulation.queue(Simulation.nextEventTime(activity * .0001D), act)
+  private def schedule() = s.enqueue(s.nextEventTime(activity * .0001D), act)
   schedule()
 
 }
