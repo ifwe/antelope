@@ -2,14 +2,17 @@ package co.ifwe.antelope.datingdemo.model
 
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope.datingdemo.event.{NewUserEvent, QueryEvent, ResponseEvent}
-import co.ifwe.antelope.datingdemo.{DatingScoringContext, User}
+import co.ifwe.antelope.datingdemo.{Gender, DatingScoringContext, User}
 import co.ifwe.antelope.{Event, Feature, Model}
 
 import scala.collection.mutable
 
-class DatingModel extends Model[DatingScoringContext] with RecommendationSource {
+class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] with RecommendationSource {
   import s._
   val users = mutable.HashMap[Long,User]()
+  val maleProfiles = mutable.ArrayBuffer[Long]()
+  val femaleProfiles = mutable.ArrayBuffer[Long]()
+
 
   val userId = defUpdate {
     case qe: QueryEvent => qe.ctx.user.profile.id
@@ -56,18 +59,30 @@ class DatingModel extends Model[DatingScoringContext] with RecommendationSource 
   })
 
   /*
-   * Add features:
+   * TODO Add features:
    *  - Generic region-to-region affinity
    *  - Personalized user-to-region affinity
    */
 
   override def update(e: Event): Unit = {
     e match {
-      case nue: NewUserEvent => users += nue.user.profile.id -> nue.user
+      case nue: NewUserEvent =>
+        val user = nue.user
+        users += user.profile.id -> user
+        (user.profile.gender match {
+          case Gender.Female => femaleProfiles
+          case Gender.Male => maleProfiles
+        }) += user.profile.id
       case _ =>
     }
     s.update(Array(e))
   }
 
-  override def getRecommendation(ctx: DatingScoringContext): User = ???
+  override def getRecommendation(ctx: DatingScoringContext): User = {
+    val candidates = (ctx.user.profile.gender match {
+      case Gender.Female => maleProfiles
+      case Gender.Male => femaleProfiles
+    }).toArray
+    users((candidates zip score(ctx, candidates, weights)).sortBy(-_._2).head._1)
+  }
 }

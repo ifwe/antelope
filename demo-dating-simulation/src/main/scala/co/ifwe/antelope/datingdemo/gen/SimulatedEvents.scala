@@ -10,7 +10,7 @@ import org.apache.commons.math3.random.RandomGenerator
 
 import scala.collection.mutable
 
-class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource) extends Iterable[Event] {
+class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource, startTime: Long, endTime: Long) extends Iterable[Event] {
 
   class SimulationRunnable(val t: Long,
                             val f: () => Option[Event])
@@ -30,15 +30,12 @@ class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource) extends It
   }
 
   override def iterator: Iterator[Event] = new CustomIterator[Event] {
-    val startTime = 1000000L
-    //  val endTime = 1100000L
-    val endTime = 2000000L
-    val printInterval = 100000L
-    var currentTime = startTime
+    var currentTime: Long = _
 
     var q: mutable.PriorityQueue[SimulationRunnable] = _
 
     override def init(): Unit = {
+      currentTime = startTime
       q = new mutable.PriorityQueue[SimulationRunnable]()
 
       implicit val sc = new SimulationContext {

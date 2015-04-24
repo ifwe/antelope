@@ -1,11 +1,10 @@
-package co.ifwe.antelope.datingdemo.exec
+package co.ifwe.antelope.datingdemo.gen
 
 import co.ifwe.antelope.datingdemo.event.{QueryEvent, ResponseEvent}
-import co.ifwe.antelope.datingdemo.gen._
-import co.ifwe.antelope.datingdemo.{HasRecommendation, PrintWatcher, VoteStats}
+import co.ifwe.antelope.datingdemo.{HasTimeRange, HasRecommendation, PrintWatcher, VoteStats}
 import org.apache.commons.math3.random.MersenneTwister
 
-trait SimulationBase extends HasRecommendation {
+trait SimulationBase extends HasRecommendation with HasTimeRange {
   def doSimulation(): Unit = {
     val genRnd = new MersenneTwister(98435435)
 
@@ -22,7 +21,7 @@ trait SimulationBase extends HasRecommendation {
         responseStats.mark()
     })
 
-    for (e <- new SimulatedEvents(genRnd, recommendation)) {
+    for (e <- new SimulatedEvents(genRnd, recommendation, startTime, endTime)) {
       e match {
         case qe: QueryEvent => recommendationStats.record(qe)
         case re: ResponseEvent => responseStats.record(re)

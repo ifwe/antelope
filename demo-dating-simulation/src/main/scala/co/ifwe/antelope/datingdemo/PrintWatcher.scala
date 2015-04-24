@@ -13,7 +13,9 @@ class PrintWatcher (printInterval: Long, printer: (Long, Long) => Unit) {
       if (nextPrintTs > 0) {
         printer(lastTs, eventCt)
       }
-      nextPrintTs += printInterval
+      while (nextPrintTs < lastTs) {
+        nextPrintTs += printInterval
+      }
     }
   }
   def finish(): Unit = {

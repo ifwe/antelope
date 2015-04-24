@@ -2,7 +2,7 @@
 # training data from Antelope Realtime Events
 #
 # e.g., run as:
-#   r --no-save < train.r
+#   r --no-save < train_dating.r
 #
 
 data <- read.csv('demo_dating_training_data.csv')
@@ -19,4 +19,4 @@ summary(mylogit)
 
 # save output to text file
 write(as.vector(coef(mylogit)[-c(1)]) / as.vector(colsd),
-  file='r_logit_coef.txt', sep=",", ncolumns=1000)
+  file='r_logit_coef_dating.txt', sep=",", ncolumns=1000)
