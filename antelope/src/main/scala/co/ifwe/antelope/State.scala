@@ -91,6 +91,7 @@ class State[T <: ScoringContext] {
 
   trait Map0[K,V] extends MapBase {
     def get(k: K): Option[V]
+    def apply(k: K): V
   }
 
   trait MapN[K,V] extends MapBase {
@@ -426,6 +427,7 @@ class State[T <: ScoringContext] {
         override def apply(x: Event): Unit = m.put(k.getFunction(x), v.getFunction(x))
       }
       def get(k: K) = m.get(k)
+      def apply(k: K) = m(k)
     })
   }
 

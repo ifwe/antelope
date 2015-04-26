@@ -2,7 +2,7 @@ package co.ifwe.antelope.datingdemo.model
 
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope.datingdemo.event.{NewUserEvent, QueryEvent, ResponseEvent}
-import co.ifwe.antelope.datingdemo.{Gender, DatingScoringContext, User}
+import co.ifwe.antelope.datingdemo.{Region, Gender, DatingScoringContext, User}
 import co.ifwe.antelope.{Event, Feature, Model}
 
 import scala.collection.mutable
@@ -25,14 +25,33 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
     case re: ResponseEvent => re.ts
   }
 
+  val userRegionUpdate = defUpdate {
+    case nue: NewUserEvent => nue.user.profile.region
+  }
+
+  val userAgeUpdate = defUpdate {
+    case nue: NewUserEvent => nue.user.profile.age
+  }
+
   // Same region
   feature(new Feature[DatingScoringContext]() {
+    val userRegion = map(userId, userRegionUpdate)
     override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
-      id: Long => if (ctx.user.profile.region == users(id).profile.region) 1 else 0
+      val srcRegion = userRegion(ctx.id)
+      id: Long => if (srcRegion == userRegion(id)) 1 else 0
     }
   })
 
-  // Recent activity
+  // Do regions share a border
+  feature(new Feature[DatingScoringContext]() {
+    val userRegion = map(userId, userRegionUpdate)
+    override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
+      val srcRegion = userRegion(ctx.id)
+      id: Long => if (Region.borders(srcRegion, userRegion(id))) 1 else 0
+    }
+  })
+
+  // Recent activity - how long ago was the user last active
   feature(new Feature[DatingScoringContext]() {
     val lastActivity = map(userId, userActivityTime)
     override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
@@ -60,10 +79,11 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
 
   // Absolute value of age difference
   feature(new Feature[DatingScoringContext]() {
+    val userAge = map(userId, userAgeUpdate)
     override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
-      val srcAge = ctx.user.profile.age.toDouble
+      val srcAge: Int = userAge(ctx.id)
       id: Long => {
-        val tgtAge = users(id).profile.age
+        val tgtAge = userAge(id)
         math.abs(srcAge - tgtAge)
       }
     }
@@ -71,10 +91,11 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
 
   // Square of value of age difference
   feature(new Feature[DatingScoringContext]() {
+    val userAge = map(userId, userAgeUpdate)
     override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
-      val srcAge = ctx.user.profile.age.toDouble
+      val srcAge = userAge(ctx.id)
       id: Long => {
-        val tgtAge = users(id).profile.age
+        val tgtAge = userAge(id)
         (srcAge - tgtAge) * (srcAge - tgtAge)
       }
     }
