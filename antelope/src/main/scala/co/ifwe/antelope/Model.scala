@@ -20,7 +20,7 @@ trait Model[T <: ScoringContext] {
    * @return
    */
   def featureValues(ctx: T, docId: Long): Array[Double] = {
-    s.score(ctx, Array(docId)).head.toArray
+    s.score(ctx, Array(docId).par).head.toArray
   }
 
   /**
@@ -39,7 +39,7 @@ trait Model[T <: ScoringContext] {
    * @return array of scores corresponding to array of candidates
    */
   def score(ctx: T, candidates: Array[Long], weights: Array[Double]): Array[Double] = {
-    s.score(ctx, candidates).map{y: Iterable[Double] => ((y zip weights) map (x => x._1 * x._2)).sum}.toArray
+    s.score(ctx, candidates.par).map{y: Iterable[Double] => ((y zip weights) map (x => x._1 * x._2)).sum}.toArray
   }
 
 }

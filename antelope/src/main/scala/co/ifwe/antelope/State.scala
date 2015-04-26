@@ -3,6 +3,8 @@ package co.ifwe.antelope
 import co.ifwe.antelope.UpdateDefinition._
 
 import scala.collection.mutable
+import scala.collection.parallel.immutable.ParIterable
+import scala.collection.parallel.mutable.ParArray
 
 /**
  * Simple in-memory state implementation.
@@ -472,7 +474,7 @@ class State[T <: ScoringContext] {
     }
   }
 
-  def score(ctx: T, ids: Array[Long]): Iterable[Iterable[Double]] = {
+  def score(ctx: T, ids: ParArray[Long]): ParArray[Iterable[Double]] = {
     val ff = features.map(f => f.score(ctx))
     ids.map(id => ff.map(_(id)))
   }
