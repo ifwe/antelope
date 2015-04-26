@@ -21,6 +21,15 @@ class VoteStats[T <: VoteEvent] {
     markedYesVoteCt = yesVoteCt
   }
 
+  def rel(o: VoteStats[_]) = {
+    val r = new VoteStats[T]()
+    r.yesVoteCt = yesVoteCt
+    r.markedYesVoteCt = markedYesVoteCt
+    r.voteCt = o.voteCt
+    r.markedVoteCt = o.markedVoteCt
+    r
+  }
+
   override def toString = {
     def formatHits(ct: Long, yCt: Long) = {
       "%d/%d hits for %.1f%%".format(yCt, ct, 100D * yCt.toDouble / ct.toDouble)

@@ -10,16 +10,18 @@ import scala.util.Random
 class GenderRecommendation(rnd: Random) extends RecommendationSource {
   val maleProfiles = mutable.ArrayBuffer[User]()
   val femaleProfiles = mutable.ArrayBuffer[User]()
+  val description = "GenderRecommendation"
 
   private def randomProfile(profiles: mutable.ArrayBuffer[User]) = {
     profiles(rnd.nextInt(profiles.length))
   }
 
-  override def getRecommendation(ctx: DatingScoringContext): User = {
-    ctx.user.profile.gender match {
+  override def getRecommendation(ctx: DatingScoringContext): Recommendation = {
+    new Recommendation(ctx.user,
+      ctx.user.profile.gender match {
       case Gender.Female => randomProfile(maleProfiles)
       case Gender.Male => randomProfile(femaleProfiles)
-    }
+      }, description)
   }
 
   override def update(e: Event): Unit = {

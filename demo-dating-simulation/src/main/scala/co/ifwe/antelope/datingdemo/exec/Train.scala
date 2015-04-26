@@ -2,10 +2,10 @@ package co.ifwe.antelope.datingdemo.exec
 
 import java.io.File
 
-import co.ifwe.antelope.datingdemo.event.{QueryEvent, VoteEvent}
+import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent, VoteEvent}
 import co.ifwe.antelope.datingdemo.gen.SimulationBase
 import co.ifwe.antelope.{TrainingExample, Event}
-import co.ifwe.antelope.datingdemo.{ModelBase, DatingScoringContext, User}
+import co.ifwe.antelope.datingdemo._
 import co.ifwe.antelope.datingdemo.model.{DatingModel, RandomRecommendation, RecommendationSource}
 import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter}
 
@@ -28,7 +28,7 @@ object Train extends App with SimulationBase with ModelBase {
       new CsvTrainingFormatter(modelRec.featureNames))))
 
   override def update(e: Event): Unit = {
-    // Write the training data ahead of other updates
+    // Write the training data ahead of updating state
     e match {
       case qe: QueryEvent => {
         if (trainingWriter != null) {

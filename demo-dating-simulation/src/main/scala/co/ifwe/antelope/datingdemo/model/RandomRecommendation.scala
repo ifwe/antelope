@@ -9,9 +9,14 @@ import scala.util.Random
 
 class RandomRecommendation(rnd: Random) extends RecommendationSource {
   val profiles = mutable.ArrayBuffer[User]()
+  val description = "RandomRecommendation"
 
-  override def getRecommendation(ctx: DatingScoringContext): User = {
-    profiles(rnd.nextInt(profiles.length))
+  override def getRecommendation(ctx: DatingScoringContext): Recommendation = {
+    new Recommendation(
+      forUser = ctx.user,
+      profiles(rnd.nextInt(profiles.length)),
+      description
+    )
   }
 
   override def update(e: Event): Unit = {

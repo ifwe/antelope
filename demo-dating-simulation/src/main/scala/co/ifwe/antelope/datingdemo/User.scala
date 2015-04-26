@@ -3,6 +3,8 @@ package co.ifwe.antelope.datingdemo
 import java.security.MessageDigest
 import java.nio.ByteBuffer
 
+import co.ifwe.antelope.datingdemo.model.Recommendation
+
 import collection.mutable
 
 import co.ifwe.antelope.Event
@@ -48,7 +50,7 @@ class User(val profile: UserProfile,
     }
   }
 
-  private def evaluateLike(user: User): Option[Event] = {
+  private def evaluateLike(user: User, recommendationInfo: Recommendation): Option[Event] = {
     if (inboundRate.getRate(s.t) < 10D) {
       inboundRate.add(s.t)
       if (previousResponses.contains(user.profile.id)) {
@@ -59,7 +61,7 @@ class User(val profile: UserProfile,
         val vote = likes(user)
         user.activityTransform(0.12)
         this.activityTransform(0.06)
-        Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote))
+        Some(new ResponseEvent(s.t, profile.id, user.profile.id, vote, recommendationInfo))
       }
     } else {
       None
@@ -74,10 +76,10 @@ class User(val profile: UserProfile,
     1D / (1D + math.exp(-(math.log(x/(1-x)) + delta)))
   }
 
-  private def queueEvaluateLike(user: User): Unit = {
+  private def queueEvaluateLike(user: User, recommendation: Recommendation): Unit = {
     val evaluateTs = s.nextEventTime(activity * .0001D)
     if (evaluateTs - s.t < MAX_RESPONSE_DELAY) {
-      s.enqueue(evaluateTs, () => evaluateLike(user))
+      s.enqueue(evaluateTs, () => evaluateLike(user, recommendation))
     }
     this.activityTransform(-0.1)
     user.activityTransform(-0.05)
@@ -86,12 +88,12 @@ class User(val profile: UserProfile,
   private def act(): Option[Event] = {
     val queryContext = new DatingScoringContext(s.t, this)
     val recommendation = s.getRecommendationSource.getRecommendation(queryContext)
-    val vote = likes(recommendation)
+    val vote = likes(recommendation.recommendedUser)
     if (vote) {
-      recommendation.queueEvaluateLike(this)
+      recommendation.recommendedUser.queueEvaluateLike(this, recommendation)
     }
     scheduleNextActivity()
-    Some(new QueryEvent(queryContext, recommendation.profile.id, vote))
+    Some(new QueryEvent(queryContext, recommendation.recommendedUser.profile.id, vote, recommendation))
   }
 
   private def scheduleNextActivity() = s.enqueue(s.nextEventTime(activity * .0001D), act)

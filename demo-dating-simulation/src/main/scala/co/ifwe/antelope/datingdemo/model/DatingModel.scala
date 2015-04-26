@@ -12,7 +12,7 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
   val users = mutable.HashMap[Long,User]()
   val maleProfiles = mutable.ArrayBuffer[Long]()
   val femaleProfiles = mutable.ArrayBuffer[Long]()
-
+  val description = "DatingModel"
 
   val userId = defUpdate {
     case qe: QueryEvent => qe.ctx.user.profile.id
@@ -78,11 +78,12 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
     s.update(Array(e))
   }
 
-  override def getRecommendation(ctx: DatingScoringContext): User = {
+  override def getRecommendation(ctx: DatingScoringContext): Recommendation = {
     val candidates = (ctx.user.profile.gender match {
       case Gender.Female => maleProfiles
       case Gender.Male => femaleProfiles
     }).toArray
-    users((candidates zip score(ctx, candidates, weights)).sortBy(-_._2).head._1)
+    val recommendedUser = users((candidates zip score(ctx, candidates, weights)).sortBy(-_._2).head._1)
+    new Recommendation(ctx.user, recommendedUser, description)
   }
 }

@@ -1,14 +1,14 @@
 package co.ifwe.antelope.datingdemo
 
 import co.ifwe.antelope.Event
-import co.ifwe.antelope.datingdemo.model.{DatingModel, RandomRecommendation, RecommendationSource}
+import co.ifwe.antelope.datingdemo.model.{Recommendation, DatingModel, RandomRecommendation, RecommendationSource}
 
 import scala.util.Random
 
 trait ModelBase extends HasTimeRange {
   val startTime: Long = 1000000
   val trainingEndTime: Long = 2000000
-  val scoringEndTime: Long = 2001000
+  val scoringEndTime: Long = 2500000
 
   val recRand = new Random(12123)
   val randomRec = new RandomRecommendation(recRand)
@@ -26,8 +26,12 @@ trait ModelBase extends HasTimeRange {
       ModelBase.this.update(e)
     }
 
-    override def getRecommendation(ctx: DatingScoringContext): User = {
-      (if (ctx.t < trainingEndTime) randomRec else modelRec).getRecommendation(ctx)
+    override def getRecommendation(ctx: DatingScoringContext): Recommendation = {
+      (if (ctx.t <= trainingEndTime || recRand.nextDouble() > 0.01) {
+        randomRec
+      } else {
+        modelRec
+      }).getRecommendation(ctx)
     }
   }
 
