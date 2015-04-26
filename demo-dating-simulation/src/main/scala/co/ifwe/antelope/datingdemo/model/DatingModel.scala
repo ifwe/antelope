@@ -58,6 +58,28 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
     }
   })
 
+  // Absolute value of age difference
+  feature(new Feature[DatingScoringContext]() {
+    override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
+      val srcAge = ctx.user.profile.age.toDouble
+      id: Long => {
+        val tgtAge = users(id).profile.age
+        math.abs(srcAge - tgtAge)
+      }
+    }
+  })
+
+  // Square of value of age difference
+  feature(new Feature[DatingScoringContext]() {
+    override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
+      val srcAge = ctx.user.profile.age.toDouble
+      id: Long => {
+        val tgtAge = users(id).profile.age
+        (srcAge - tgtAge) * (srcAge - tgtAge)
+      }
+    }
+  })
+
   /*
    * TODO Add features:
    *  - Generic region-to-region affinity

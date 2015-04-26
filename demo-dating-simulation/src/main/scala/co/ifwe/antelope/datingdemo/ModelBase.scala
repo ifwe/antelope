@@ -13,7 +13,7 @@ trait ModelBase extends HasTimeRange {
   val recRand = new Random(12123)
   val randomRec = new RandomRecommendation(recRand)
 
-  val weights = Array[Double](0.95576,-1.155302e-07,-0.02146215)
+  val weights = Array[Double](0.8798047,-3.07801e-07,-0.0265151,-0.008752,-0.002450404)
   val modelRec = new DatingModel(weights)
 
   def update(e: Event): Unit = {

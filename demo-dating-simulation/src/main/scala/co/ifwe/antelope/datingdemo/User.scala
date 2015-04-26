@@ -9,12 +9,13 @@ import collection.mutable
 
 import co.ifwe.antelope.Event
 import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent}
-import co.ifwe.antelope.datingdemo.gen.SimulationContext
+import co.ifwe.antelope.datingdemo.gen.{AgeAffinity, SimulationContext}
 
 class User(val profile: UserProfile,
            private var activity: Double,
            selectivity: Double,
-           regionAffinity: Array[Double])(implicit s: SimulationContext) {
+           regionAffinity: Array[Double],
+           ageAffinity: AgeAffinity)(implicit s: SimulationContext) {
 
   private val MAX_RESPONSE_DELAY = 1000000
 
@@ -37,13 +38,13 @@ class User(val profile: UserProfile,
     val low = (resInts.get(1) & 0x07ffffff).toLong
     (high | low) * DOUBLE_UNIT
   }
-//  res4: Long = 4222319432995412684
 
   private def likes(other: User): Boolean = {
     // We limit this simulation to straight profiles to keep things simple
     if (profile.gender != other.profile.gender
-      && combineDouble(profile.id, other.profile.id,7930283810011048737L) < selectivity
-      && combineDouble(profile.id, other.profile.id,5511114762692428345L) < regionAffinity(other.profile.region.##)) {
+      && combineDouble(profile.id, other.profile.id, 7930283810011048737L) < selectivity
+      && combineDouble(profile.id, other.profile.id, 5511114762692428345L) < regionAffinity(other.profile.region.##)
+      && combineDouble(profile.id, other.profile.id, 4222319432995412684L) < ageAffinity.p(profile.age, other.profile.age)) {
       true
     } else {
       false

@@ -4,7 +4,7 @@ import co.ifwe.antelope.datingdemo.Region
 import co.ifwe.antelope.datingdemo.Region._
 import org.apache.commons.math3.random.RandomGenerator
 
-class RegionRandom(val rnd: RandomGenerator) {
+class RegionRandom(rnd: RandomGenerator) {
   val nRegions = Region.values.size
   val dirichletInputs = Array.fill[Double](nRegions)(1.25)
   val dr = new DirichletRandom(rnd, dirichletInputs)

@@ -74,6 +74,7 @@ class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource, startTime:
       val activityRandom = new BetaRandom(rnd, 2.5, 1.5)
       val selectivityRandom = new BetaRandom(rnd, 1.5, 2.5)
       val regionAffinityRandom = new RegionRandom(rnd)
+      val ageAffinityRandom = new AgeAffinityRandom(rnd)
 
       class UserGenerator {
         def newUserRate = if (currentTime < 2000000) {
@@ -92,7 +93,8 @@ class SimulatedEvents(rnd: RandomGenerator, rs: RecommendationSource, startTime:
             profile = p,
             activity = activityRandom.next(),
             selectivity = selectivityRandom.next(),
-            regionAffinity = regionAffinityRandom.next(p.region)
+            regionAffinity = regionAffinityRandom.next(p.region),
+            ageAffinity = ageAffinityRandom.next()
           )
           nextUserId += 1
           u
