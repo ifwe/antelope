@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Antelope : Antelope Realtime Events framework for feature engineering in agile machine learning environments.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Antelope</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ifwe/antelope">View on GitHub</a>
+
+          <h1 id="project_title">Antelope</h1>
+          <h2 id="project_tagline">Antelope Realtime Events framework for feature engineering in agile machine learning environments.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ifwe/antelope/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ifwe/antelope/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="antelope-realtime-events" class="anchor" href="#antelope-realtime-events" aria-hidden="true"><span class="octicon octicon-link"></span></a>Antelope Realtime Events</h1>
+
+<p>The <em>Antelope Realtime Events</em> project aims to make iterative and agile machine learning
+a practical reality, especially in systems that must respond immediately to new
+circumstances.  It derives from a proprietary framework used by
+<a href="http://www.ifwe.co/">if(we)</a> to develop recommendation engines for our social products.
+By unifying the software that data scientists use to extract data for training a
+machine learning model with the software used to run that model in production, a much
+faster progress cycle becomes possible.</p>
+
+<h2>
+<a id="whats-new-in-v02" class="anchor" href="#whats-new-in-v02" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's new in v0.2</h2>
+
+<p>This remains a demonstration release designed to expose the API and programming style.</p>
+
+<p>Updates in v0.2 include:</p>
+
+<ul>
+<li>Spell correction in product search demo - we found that the most apparent cause of 
+recommendation errors in the demo was spelling mistakes.</li>
+<li>
+<a href="doc/demo-web.md">Web demo</a> - front-end for the product search demo so you can
+interact with the product directly</li>
+<li>Cached events - this performance improvement saves events to a cache using binary
+serialization. Eliminating input parsing and merging overheads speeds up development
+cycles and makes practical larger data sets.</li>
+<li>Expanded feature types - we introduce a greater variety of features as well as 
+<a href="doc/features.md">feature engineering documentation</a>.</li>
+</ul>
+
+<p>We encourage you to explore the framework and to run the demos, but please understand
+that production needs have not been yet provided for. Among other things, the in-memory
+state representation uses JVM objects whereas our production implementation uses
+packed arrays, an optimization that allows for larger models and practical checkpoints.</p>
+
+<p>We're releasing Antelope now because we want your feedback!  Please join the
+<a href="https://groups.google.com/forum/#!forum/antelope-rte">Google Group</a> and please
+don't hesitate to post your questions, suggestions, or ideas.</p>
+
+<h2>
+<a id="running-the-kaggle-demo" class="anchor" href="#running-the-kaggle-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the Kaggle Demo</h2>
+
+<p>Perhaps the best way to understand what Antelope does is by giving it a quick try.
+This project contains examples that work with the 
+<a href="https://www.kaggle.com/c/acm-sf-chapter-hackathon-small">ACM SF Chapter's Best Buy data set</a>.</p>
+
+<p>Please see the <a href="doc/demo.md">Getting Started with the Demo</a> documentation and
+follow the instructions to download the data and to go through a simple machine
+learning exercise. To see this demonstration embedded in a working web application
+check out instructions at <a href="doc/demo-web.md">Running the Web Demo</a>.</p>
+
+<h2>
+<a id="language-for-feature-engineering" class="anchor" href="#language-for-feature-engineering" aria-hidden="true"><span class="octicon octicon-link"></span></a>Language for feature engineering</h2>
+
+<p>Antelope aims to provide an expressive DSL-like experience for shaping raw streams of
+input events into the signals or features directly useful to machine learning. Our
+guiding principle is that concepts that are easy to explain should be easy to implement.
+Please see the <a href="doc/features.md">feature engineering</a> documentation for further
+descriptions and examples.</p>
+
+<h2>
+<a id="applicability" class="anchor" href="#applicability" aria-hidden="true"><span class="octicon octicon-link"></span></a>Applicability</h2>
+
+<h3>
+<a id="what-antelope-does-or-will-do-eventually" class="anchor" href="#what-antelope-does-or-will-do-eventually" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Antelope does (or will do... eventually)</h3>
+
+<ul>
+<li>Make it easy to derive useful features from event history</li>
+<li>Allow models to reflect new events within seconds, or even in under a second</li>
+<li>Produce top recommendations from millions of candidates in a fraction of a second</li>
+<li>Enable rapid iterative cycle around feature ideas, model training, and production deployment</li>
+<li>Allow one definition of model features to be used in training, offline validation, and production</li>
+<li>Provide access to powerful programming abstractions by integrating with Scala language</li>
+<li>Accept a variety of machine learning techniques</li>
+<li>Works with scalable stream processing frameworks (not yet, but that's our vision)</li>
+</ul>
+
+<h3>
+<a id="what-antelope-doesnt-do" class="anchor" href="#what-antelope-doesnt-do" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Antelope doesn't do</h3>
+
+<ul>
+<li>Accept data that is not structured in form of events - that's our requirement!</li>
+<li>Train machine learning models - there are plenty of implementations for those</li>
+<li>Collect or store event logs - integrate with Kafka, Hadoop, or related technologies</li>
+<li>Store model state - we build on databases and stream processing frameworks</li>
+</ul>
+
+<h2>
+<a id="frequently-asked-questions" class="anchor" href="#frequently-asked-questions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Frequently Asked Questions</h2>
+
+<h3>
+<a id="why-doesnt-ifwe-release-the-machine-learning-framework-they-are-actively-using" class="anchor" href="#why-doesnt-ifwe-release-the-machine-learning-framework-they-are-actively-using" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why doesn't if(we) release the machine learning framework they are actively using?</h3>
+
+<p>Antelope is derived from a proprietary in-house framework that's tied to a legacy
+custom logging infrastructure and that lacks clean separation from some of our
+domain-specific needs.</p>
+
+<p>We're building Antelope on broadly-used open-source foundations.  Today, if(we) is
+migrating the logging infrastructure to <a href="https://kafka.apache.org/">Kafka</a> and we
+have introduced stream processing frameworks such as <a href="https://storm.apache.org/">Storm</a>
+and <a href="https://spark.apache.org/">Spark</a>.  Antelope is designed to work well with these
+technologies.</p>
+
+<p>Also, there are so many things we would do differently today, and a rewrite gives
+us that opportunity.</p>
+
+<h3>
+<a id="when-will-i-be-able-to-use-antelope-in-production" class="anchor" href="#when-will-i-be-able-to-use-antelope-in-production" aria-hidden="true"><span class="octicon octicon-link"></span></a>When will I be able to use Antelope in production?</h3>
+
+<p>That depends on how much support we get from people like you.  Please join the
+<a href="https://groups.google.com/forum/#!forum/antelope-rte">Google Group</a> and let's talk about
+how you can help.</p>
+
+<h3>
+<a id="will-antelope-work-with-my-favorite-machine-learning-algorithm" class="anchor" href="#will-antelope-work-with-my-favorite-machine-learning-algorithm" aria-hidden="true"><span class="octicon octicon-link"></span></a>Will Antelope work with my favorite machine learning algorithm?</h3>
+
+<p>Antelope is largely agnostic of choice of machine learning technique as it creates the feature
+vectors that can serve as inputs to arbitrary supervised learning implementations.  The
+techniques we deploy most commonly at if(we) are logistic regression and random forests.  We
+also sometimes implement purely heuristic decision criteria.</p>
+
+<h3>
+<a id="will-antelope-work-with-my-programming-favorite-language-stream-processing-framework-database-or-other-technology" class="anchor" href="#will-antelope-work-with-my-programming-favorite-language-stream-processing-framework-database-or-other-technology" aria-hidden="true"><span class="octicon octicon-link"></span></a>Will Antelope work with my programming favorite language, stream processing framework, database, or other technology?</h3>
+
+<p>The Antelope approach is framework-agnostic when it comes to sourcing, processing, or storing
+data.  We are designing for pluggable implementations, so if we're not compatible with your
+favorite technologies, then please talk to us about helping make that happen.</p>
+
+<p>Antelope, at it's core, is a Scala-based implementation.  Early on, we considered developing a
+custom language for expressing features.  It's an idea we come back to from time to time, but
+each time we've revisited it we've concluded that it makes more sense to build a library that
+works in concert with a full-featured and powerful programming environment.</p>
+
+<h3>
+<a id="what-if-i-dont-program-in-scala" class="anchor" href="#what-if-i-dont-program-in-scala" aria-hidden="true"><span class="octicon octicon-link"></span></a>What if I don't program in Scala?</h3>
+
+<p>Scala programmers will find working with Antelope very comfortable.  If you're not a Scala
+developer, rest assured that you can use Antelope effectively with only very limited
+Scala knowledge.  Once you learn the Antelope primitives and the basics of Scala syntax
+you should be well on your way.</p>
+
+<hr>
+
+<p>README.md: Copyright 2015 Ifwe Inc.</p>
+
+<p>README.md is licensed under a Creative Commons Attribution-ShareAlike 4.0
+International License.</p>
+
+<p>You should have received a copy of the license along with this work. If not,
+see <a href="http://creativecommons.org/licenses/by-sa/4.0/">http://creativecommons.org/licenses/by-sa/4.0/</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Antelope maintained by <a href="https://github.com/ifwe">ifwe</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-62356802-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
