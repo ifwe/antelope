@@ -1,10 +1,15 @@
-baseurl: "/shiori" # The subpath of your site. Use "" if you're hosting a blog at the root level.
-url: "http://ellekasai.github.io" # the base hostname & protocol for your site
-title: "Shiori"
+baseurl: "/antelope" # The subpath of your site. Use "" if you're hosting a blog at the root level.
+url: "https://ifwe.github.io" # the base hostname & protocol for your site
+githubsrc: "https://www.github.com/ifwe/antelope/tree/master"
+googlegroupurl: "https://groups.google.com/forum/#!forum/antelope-rte"
+title: "Antelope"
 
 # This is used by feed.xml. Uncomment if you want to use it.
 # description: "..."
 
+kramdown:
+  input: GFM
+  hard_wrap: false
 gems:
   - jemoji
 exclude:
