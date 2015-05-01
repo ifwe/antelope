@@ -3,7 +3,7 @@ package co.ifwe.antelope.datingdemo.model
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope.datingdemo.event.{NewUserEvent, QueryEvent, ResponseEvent}
 import co.ifwe.antelope.datingdemo.{Region, Gender, DatingScoringContext, User}
-import co.ifwe.antelope.{Event, Feature, Model}
+import co.ifwe.antelope.{Updatable, Event, Feature, Model}
 
 import scala.collection.mutable
 
@@ -31,6 +31,16 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
 
   val userAgeUpdate = defUpdate {
     case nue: NewUserEvent => nue.user.profile.age
+  }
+
+  val userIdVoted = defUpdate {
+    case qe: QueryEvent => qe.ctx.user.profile.id
+    case re: ResponseEvent => re.id
+  }
+
+  val userVote = defUpdate {
+    case qe: QueryEvent => qe.vote
+    case re: ResponseEvent => re.vote
   }
 
   // Same region
@@ -100,6 +110,42 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
       }
     }
   })
+
+  // Overall yes rate and votes above threshold, features used together
+  val thresholdVotes = 5
+  feature(new Feature[DatingScoringContext]() {
+    class VoteRatio extends Updatable[Boolean] {
+      var ct = 0
+      var yesCt = 0
+      override def update(x: Boolean): Unit = {
+        ct += 1
+        if (x) {
+          yesCt += 1
+        }
+      }
+    }
+    val voteRatios = mapUpdatable(userId, userVote, new VoteRatio)
+    override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
+      id: Long => {
+        voteRatios.get(id) match {
+          case Some(vr: VoteRatio) => if (vr.ct >= thresholdVotes) {
+              vr.yesCt.toDouble / vr.ct.toDouble
+            } else {
+              0D
+            }
+          case None => 0D
+        }
+      }
+    }
+  })
+  // Voting count above threshold
+  feature(new Feature[DatingScoringContext]() {
+    val voteCounts = counter(userIdVoted)
+    override def score(implicit ctx: DatingScoringContext): (Long) => Double = {
+      id: Long => if (voteCounts(id) >= thresholdVotes) 1D else 0D
+    }
+  })
+
 
   /*
    * TODO Add features:

@@ -454,6 +454,20 @@ class State[T <: ScoringContext] {
     })
   }
 
+  def mapUpdatable[K,V,T <: Updatable[V]](k: SimpleUpdateDefinition[K], v: SimpleUpdateDefinition[V],
+    newUpdatable: => T): Map0[K,T] = {
+    registerMap(new Map0[K,T] {
+      val m = mutable.HashMap[K,T]()
+      override def put = new PartialFunction[Event, Unit] {
+        override def isDefinedAt(x: Event): Boolean = k.getFunction.isDefinedAt(x) && v.getFunction.isDefinedAt(x)
+
+        override def apply(x: Event): Unit = m.getOrElseUpdate(k.getFunction(x), newUpdatable).update(v.getFunction(x))
+      }
+      override def get(k: K): Option[T] = m.get(k)
+      override def apply(k: K): T = m(k)
+    })
+  }
+
   def feature[U <: T](f: Feature[U]): Unit = {
     features += f.asInstanceOf[Feature[T]]
   }
