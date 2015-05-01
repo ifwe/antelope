@@ -158,7 +158,7 @@ Full source: [TfIdfFeature.scala]({{ "/antelope/src/main/scala/co/ifwe/antelope/
 
 ## Additional examples from the dating simulation model ##
 
-In the DatingModel we use an inline representation whereby features are defined in the model where they are used. We explore these features in detail here, whereas the full source is available in [DatingModel.scala]({{"/demo-dating-simulation/src/main/scala/co/ifwe/antelope/datingDemo/DatingModel.scala" | prepend: site.githubsrc}}).
+In the DatingModel we use an inline representation whereby features are defined in the model where they are used. We explore these features in detail here, whereas the full source is available in [DatingModel.scala]({{"demo-dating-simulation/src/main/scala/co/ifwe/antelope/datingdemo/model/DatingModel.scala" | prepend: site.githubsrc}}).
 
 
 
