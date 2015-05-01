@@ -1,11 +1,6 @@
 Please visit the [Antelope Realtime Events Site](https://ifwe.github.io/antelope/) for project
 description and documentation.
 
-<p align="center">
-  <img src="doc/images/antelope-logo-1.png?raw=true" alt="Antelope Realtime Events logo"/>
-</p>
-
-
 
 -----
 
