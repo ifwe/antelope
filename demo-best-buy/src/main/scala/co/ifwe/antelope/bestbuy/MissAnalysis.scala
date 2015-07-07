@@ -9,9 +9,9 @@ import scala.collection.mutable
 import scala.util.Random
 
 /**
- * Analysis of bad predictions
+ * Analysis of bad predictions and spelling mistakes
  */
-class MissAnalysis(spellingPrintCtMax: Int = 25, nonSpellingPrintCtMax: Int = 0) {
+class MissAnalysis(spellingPrintCtMax: Int = 0, nonSpellingPrintCtMax: Int = 0) {
   private var missCt = 0
   private var spellingPrintCt = 0
   private var nonSpellingPrintCt = 0
@@ -100,7 +100,7 @@ class MissAnalysis(spellingPrintCtMax: Int = 25, nonSpellingPrintCtMax: Int = 0)
   }
 
   def summarize(): Unit = {
-    println("correction types")
+    println("Candidates for spelling correction")
     spellingStats.map(_._1).zip(correctionCounts).foreach {
       case (desc, ct) =>
         println(s"$desc: $ct")

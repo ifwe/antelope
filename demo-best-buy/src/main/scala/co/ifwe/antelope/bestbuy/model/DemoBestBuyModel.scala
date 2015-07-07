@@ -14,7 +14,7 @@ import scala.math._
  * the model to facilitate reuse, but for demonstrations this is
  * implementation is more straightforward.
  *
- * You can modify [[co.ifwe.antelope.bestbuy.ModelEventProcessor ModelEventProcessor]]
+ * You can modify [[co.ifwe.antelope.bestbuy.Env]]
  * and replace reference to [[BestBuyModel]] with this class in
  * order to use it.
  */

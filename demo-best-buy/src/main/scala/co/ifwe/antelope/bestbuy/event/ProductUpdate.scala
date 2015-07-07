@@ -22,7 +22,6 @@ case class ProductUpdate(ts: Long, val sku: Long, val name: String, val descript
     s"${util.formatTimestamp(ts)}:$sku:$name:${categories.mkString(",")}:${shortDesc}"
   }
   override def equals(o: Any) = {
-    // TODO could probably simply this by not extending Product and just having one case class
     if (o.isInstanceOf[ProductUpdate]) {
       val op = o.asInstanceOf[ProductUpdate]
       this.ts == op.ts && this.sku == op.sku && this.name == op.name && this.description == op.description &&

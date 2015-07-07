@@ -2,46 +2,41 @@ package co.ifwe.antelope.datingdemo.exec
 
 import java.io.File
 
-import co.ifwe.antelope.datingdemo.event.{ResponseEvent, QueryEvent, VoteEvent}
-import co.ifwe.antelope.datingdemo.gen.SimulationBase
-import co.ifwe.antelope.{TrainingExample, Event}
 import co.ifwe.antelope.datingdemo._
-import co.ifwe.antelope.datingdemo.model.{DatingModel, RandomRecommendation, RecommendationSource}
+import co.ifwe.antelope.datingdemo.event.{NewUserEvent, QueryEvent}
+import co.ifwe.antelope.datingdemo.gen.Simulation
 import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter}
+import co.ifwe.antelope.model.Training
+import co.ifwe.antelope.{Event, Model, TrainingExample}
 
-import scala.util.Random
-
-object Train extends App with SimulationBase with ModelBase {
-  val endTime = trainingEndTime
-
-  val trainingDir = System.getenv("ANTELOPE_TRAINING")
-  if (trainingDir == null || trainingDir.isEmpty) {
-    throw new IllegalArgumentException("must set $ANTELOPE_TRAINING environment variable")
-  }
-
-  def getTrainingFile(name: String): String = {
-    trainingDir + File.separator + name
-  }
-
+object Train extends App with Simulation with ModelBase {
   val trainingWriter = new MultiFormatWriter(Array(
-    (getTrainingFile("demo_dating_training_data.csv"),
-      new CsvTrainingFormatter(modelRec.featureNames))))
+    (trainingFile, new CsvTrainingFormatter(modelRec.featureNames))))
 
-  override def update(e: Event): Unit = {
-    // Write the training data ahead of updating state
-    e match {
-      case qe: QueryEvent => {
-        if (trainingWriter != null) {
-          trainingWriter.write(new TrainingExample(
-            qe.vote,
-            modelRec.featureNames zip modelRec.featureValues(qe.ctx, qe.otherId)))
-        }
+  val t = new Training[DatingScoringContext, Model[DatingScoringContext]] {
+    override val eventHistory = Train.eventHistory
+    override def newDocUpdated(e: Event): Option[Long] = {
+      e match {
+        case nue: NewUserEvent => Some(nue.user.profile.id)
+        case _ => None
       }
-      case _ =>
     }
-    super.update(e)
-  }
 
-  doSimulation()
-  trainingWriter.close()
+    override def getTrainingExamples(e: Event): Option[Iterable[co.ifwe.antelope.TrainingExample]] = {
+      e match {
+        case qe: QueryEvent =>
+          Some(Array(new TrainingExample(
+            qe.vote,
+            modelRec.featureNames zip modelRec.featureValues(qe.ctx, qe.otherId))).toIterable)
+        case _ => None
+      }
+    }
+  }
+  try {
+    t.train(startTime,trainingEndTime, m, trainingWriter)
+    doSimulation()
+    println(s"training output at $trainingFile")
+  } finally {
+    trainingWriter.close()
+  }
 }

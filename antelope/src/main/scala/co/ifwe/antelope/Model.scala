@@ -36,10 +36,10 @@ trait Model[T <: ScoringContext] {
    * @param ctx context in which to calculate scores
    * @param candidates identifiers of candidates for which scores are to be computed
    * @param weights model parameters
-   * @return array of scores corresponding to array of candidates
+   * @return (array of scores corresponding to array of candidates, context used in the query)
    */
-  def score(ctx: T, candidates: Array[Long], weights: Array[Double]): Array[Double] = {
-    s.score(ctx, candidates.par).map{y: Iterable[Double] => ((y zip weights) map (x => x._1 * x._2)).sum}.toArray
+  def score(ctx: T, candidates: Array[Long], weights: Array[Double]): (Array[Double], T) = {
+    (s.score(ctx, candidates.par).map{y: Iterable[Double] => ((y zip weights) map (x => x._1 * x._2)).sum}.toArray, ctx)
   }
 
 }

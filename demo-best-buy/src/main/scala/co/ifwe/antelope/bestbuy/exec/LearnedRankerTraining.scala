@@ -1,71 +1,51 @@
 package co.ifwe.antelope.bestbuy.exec
 
 import co.ifwe.antelope._
-import co.ifwe.antelope.bestbuy.event.ProductView
-import co.ifwe.antelope.bestbuy.{BestBuyScoringContext, EventProcessing, ModelEventProcessor}
+import co.ifwe.antelope.bestbuy.Env
+import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
 import co.ifwe.antelope.io.{CsvTrainingFormatter, MultiFormatWriter, VowpalTrainingFormatter}
-
-import scala.util.Random
+import co.ifwe.antelope.model.Training
 
 /**
  * Generate training data - run this program to generate training data
- * for the model specified in [[ModelEventProcessor]]
+ * for the model specified in [[Env]]
  */
-object LearnedRankerTraining extends App with EventProcessing {
-  final val TRAINING_START = 10000
-  final val TRAINING_LIMIT = 30000
-
-  // Use only a portion of the data set so that we can use
-  // the later time period for model evaluation
-  override def productViewLimit(): Int = TRAINING_LIMIT
-
-  override protected def getEventProcessor() = new ModelEventProcessor() {
-    var trainingWriter: MultiFormatWriter = null
-    val rnd = new Random(23049L)
-    var viewCt = 0
-
-    private def getRandomDoc() = {
-      // TODO this is wasteful in making lots of copies
-      val docs = allDocs.toArray
-      docs(rnd.nextInt(docs.length))
+object LearnedRankerTraining extends App with Env {
+  val t = new Training[ProductSearchScoringContext, Model[ProductSearchScoringContext]] {
+    override val eventHistory = LearnedRankerTraining.eventHistory
+    override def newDocUpdated(e: Event): Option[Long] = {
+      e match {
+        case pu: ProductUpdate => Some(pu.sku)
+        case _ => None
+      }
     }
 
-    override protected def init(): Unit = {
-      super.init()
-      trainingWriter = new MultiFormatWriter(Array(
-        (getTrainingFile("training_data.csv"),
-          new CsvTrainingFormatter(m.featureNames)),
-        (getTrainingFile("training_data_vw.txt"),
-          new VowpalTrainingFormatter())
-      ))
-    }
-
-    override def consume(e: Event): Unit = {
+    override def getTrainingExamples(e: Event): Option[Iterable[TrainingExample]] = {
       e match {
         case pv: ProductView =>
-          def printTrainingResult(docId: Long, outcome: Boolean): Unit = {
-            val ctx = new BestBuyScoringContext(pv.query, sm, pv.ts)
-            trainingWriter.write(new TrainingExample(outcome, m.featureNames zip m.featureValues(ctx, docId)))
+          val ctx = new ProductSearchScoringContext {
+            val t = pv.ts
+            val query = pv.query
           }
-
-          viewCt += 1
-          if (viewCt > TRAINING_START) {
-            // Generate training data
-            printTrainingResult(pv.skuSelected, true)
-            val randomDoc = getRandomDoc()
-            printTrainingResult(randomDoc, randomDoc == pv.skuSelected)
-          }
-        case _ =>
-      }
-      super.consume(e)
-    }
-
-    override def onShutdown() {
-      try {
-        trainingWriter.close()
-      } finally {
-        super.onShutdown()
+          val randomDoc = allDocs.getRandomDoc(rnd)
+          // We generate two training examples, one for the sku selected and a second for a sku selected at random
+          Some(Array(
+            new TrainingExample(true, model.featureNames zip model.featureValues(ctx, pv.skuSelected)),
+            new TrainingExample(randomDoc == pv.skuSelected, model.featureNames zip model.featureValues(ctx, randomDoc))
+          ))
+        case _ => None
       }
     }
+  }
+  val trainingWriter = new MultiFormatWriter(Array(
+    (getTrainingFile("training_data.csv"),
+      new CsvTrainingFormatter(model.featureNames)),
+    (getTrainingFile("training_data_vw.txt"),
+      new VowpalTrainingFormatter())
+  ))
+  try {
+    t.train(TRAINING_START,TRAINING_LIMIT, model, trainingWriter)
+  } finally {
+    trainingWriter.close()
   }
 }

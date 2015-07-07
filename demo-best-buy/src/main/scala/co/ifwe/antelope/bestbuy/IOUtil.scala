@@ -4,6 +4,8 @@ import java.io._
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
+import scala.io.Source
+
 object IOUtil {
 
   private def dateFormat(fmt: String) = {
@@ -58,12 +60,12 @@ object IOUtil {
     }
   }
 
-  def findFiles(path: String, filter: String => Boolean): Iterable[String] = {
+  def findFiles(path: String, filter: String => Boolean): Iterable[File] = {
     (new File(path)).listFiles(new FilenameFilter {
       override def accept(dir: File, name: String): Boolean = {
         filter(name)
       }
-    }).map(_.getPath)
+    })
   }
 
   def copy(is: InputStream, os: OutputStream): Unit = {

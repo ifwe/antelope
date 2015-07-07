@@ -172,7 +172,7 @@ class DatingModel(weights: Array[Double]) extends Model[DatingScoringContext] wi
       case Gender.Female => maleProfiles
       case Gender.Male => femaleProfiles
     }).toArray
-    val recommendedUser = users((candidates zip score(ctx, candidates, weights)).sortBy(-_._2).head._1)
+    val recommendedUser = users((candidates zip score(ctx, candidates, weights)._1).sortBy(-_._2).head._1)
     new Recommendation(ctx.user, recommendedUser, description)
   }
 }

@@ -1,48 +1,47 @@
 package co.ifwe.antelope.bestbuy.exec
 
-import co.ifwe.antelope.Event
+import java.io.File
+
+import co.ifwe.antelope.bestbuy._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
-import co.ifwe.antelope.bestbuy.exec.LearnedRankerTraining.TRAINING_LIMIT
-import co.ifwe.antelope.bestbuy.{EventProcessing, MissAnalysis, ModelEventProcessor, RecommendationStats}
+import co.ifwe.antelope.io.WeightsReader
+import co.ifwe.antelope.model.Scoring
+import co.ifwe.antelope._
 
 /**
  * Score a some of the documents based on training data - run this
  * program to test or demonstrate effectiveness of the model.
  */
-object LearnedRankerScoring extends App with EventProcessing {
-  override def productViewLimit(): Int = 40000
-  override protected def getEventProcessor() = {
-    val rs = new RecommendationStats()
-    val ma = new MissAnalysis()
+object LearnedRankerScoring extends App with Env {
+  val weights = WeightsReader.getWeights(new File(weightsFn).toURI.toURL)
+  val st = new BestBuyStats
 
-    new ModelEventProcessor(
-//        TODO - separate this for purpose of simple demo
-        weights = Array(59.3188,42.97628,0.1188885,-0.01602002,1.371848,0.1308245),
-        progressPrintInterval = 500) {
-      var viewCt = 0
+  val s = new Scoring[ProductSearchScoringContext,BestBuyEvaluation] {
+    override val eventHistory: EventHistory = LearnedRankerScoring.eventHistory
+    override val model: Model[ProductSearchScoringContext] = LearnedRankerScoring.model
+    val ranker = new Ranker(model, weights,allDocs)
 
-      override protected def consume(e: Event) = {
-        e match {
-          case pv: ProductView =>
-            viewCt += 1
-            if (viewCt > TRAINING_LIMIT) {
-              val td = topDocs(pv.query, pv.ts, 5).topDocs
-              val hit = rs.record(pv.skuSelected, td)
-              if (!hit) {
-                ma.miss(pv, td)
-              }
-            }
-          case pu: ProductUpdate =>
-            ma.register(pu)
-          case _ =>
-        }
-        super.consume(e)
+    // TODO code duplicated with LearnedRankerTraining
+    override def newDocUpdated(e: Event): Option[Long] = {
+      e match {
+        case pu: ProductUpdate => Some(pu.sku)
+        case _ => None
       }
-      override protected def postProcess() {
-        println("%s finishing with stats: %s".format(m, rs))
-        println(ma.summarize())
-        super.postProcess()
+    }
+
+    override def evaluate(e: Event): Option[BestBuyEvaluation] = {
+      e match {
+        case pv: ProductView =>
+          val scoringContext = new ProductSearchScoringContext {
+            val t = pv.ts
+            val query = pv.query
+          }
+          val rankedResult = ranker.topN(scoringContext, 5)
+          Some(new BestBuyEvaluation(pv, rankedResult.topDocs))
+        case _ => None
       }
     }
   }
+  s.score(0, TRAINING_LIMIT, SCORING_LIMIT, st)
+  st.summarize
 }

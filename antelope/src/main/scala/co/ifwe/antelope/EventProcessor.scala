@@ -4,7 +4,7 @@ abstract class EventProcessor {
 
   protected def init() { }
 
-  protected def consume(e: Event)
+  protected def consume(e: Event): Boolean
 
   protected def postProcess() { }
 
@@ -41,11 +41,25 @@ abstract class EventProcessor {
     }
   }
 
-  def process(es: Traversable[Event], limit: Int = 0) {
+//  def process(es: Traversable[Event], limit: Int = 0) {
+//    if (limit > 0) {
+//      confirmOrder(es.take(limit)).foreach(consume)
+//    } else {
+//      es.foreach(consume)
+//    }
+//  }
+
+  def process(source: (Event=>Boolean) => Unit, limit: Int = 0): Unit = {
     if (limit > 0) {
-      confirmOrder(es.take(limit)).foreach(consume)
+      var ct = 0
+      source((e: Event) => {
+        ct += 1
+        consume(e) && ct < limit
+      })
     } else {
-      es.foreach(consume)
+      source((e: Event) => {
+        consume(e)
+      })
     }
   }
 

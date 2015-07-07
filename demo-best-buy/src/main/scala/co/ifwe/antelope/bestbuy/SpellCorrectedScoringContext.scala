@@ -8,7 +8,7 @@ import co.ifwe.antelope.bestbuy.model.SpellingModel
  * by the user though extensions are possible, e.g., a user id or session id.
  * @param rawQuery
  */
-class BestBuyScoringContext(rawQuery: String, spellingModel: SpellingModel, val t: Long) extends ProductSearchScoringContext {
+class SpellCorrectedScoringContext(rawQuery: String, spellingModel: SpellingModel, val t: Long) extends ProductSearchScoringContext {
   val (query, correction) = spellingModel.correct(rawQuery) match {
     case Some(correction) => (correction, Some(correction))
     case None => (rawQuery, None)

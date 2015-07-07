@@ -1,36 +1,22 @@
 package co.ifwe.antelope.bestbuy
 
 import java.io.File
-import java.text.SimpleDateFormat
 
 import co.ifwe.antelope.UpdateDefinition._
 import co.ifwe.antelope._
-import co.ifwe.antelope.bestbuy.IOUtil._
 import co.ifwe.antelope.bestbuy.event.{ProductUpdate, ProductView}
+import co.ifwe.antelope.io.WeightsReader
+import co.ifwe.antelope.model.AllDocs
 import org.json4s.{DefaultFormats, Formats}
 import org.scalatra.json._
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 
-class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSupport {
+class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSupport with EventProcessing {
   val logger = LoggerFactory.getLogger(getClass)
 
   protected implicit val jsonFormats: Formats = DefaultFormats.withBigDecimal
-
-  // TODO lots of duplication to remove here, should share code with
-  // co.ifwe.antelope.bestbuy.EventProcessing
-  val dataDir = System.getenv("ANTELOPE_DATA")
-  if (dataDir == null || dataDir.isEmpty) {
-    throw new IllegalArgumentException("must set $ANTELOPE_DATA environment variable")
-  }
-  val trainingDir = System.getenv("ANTELOPE_TRAINING")
-  if (trainingDir == null || trainingDir.isEmpty) {
-    throw new IllegalArgumentException("must set $ANTELOPE_TRAINING environment variable")
-  }
-
-  val viewsFn = dataDir + File.separator + "train_sorted.csv"
-  val productsFn = dataDir + File.separator + "small_product_data.xml"
 
   val catalog = mutable.HashMap[Long, ProductUpdate]()
 
@@ -38,50 +24,38 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
     def suggest(query: String, limit: Int): Array[String]
   }
 
-  val ep = new ModelEventProcessor(
-    weights = Array(87.48098,3013.327,0.1203471,4506.025,-0.02656143),
-    progressPrintInterval = 500) with Suggestions {
+  val suggestModel = new Model[ProductSearchScoringContext] with Suggestions {
+    import co.ifwe.antelope.Text.normalize
+    import s._
 
-    val suggestModel = new Model[ProductSearchScoringContext] with Suggestions {
-      import co.ifwe.antelope.Text.normalize
-      import s._
-      val queryPopularityCounter = stringPrefixCounter(defUpdate {
-        case pv: ProductView => normalize(pv.query)
-      })
-      def suggest(query: String, limit: Int): Array[String] = {
-        queryPopularityCounter.prefixSearch(normalize(query)).toArray.sortBy(_._2).map(_._1).take(limit)
-      }
-    }
+    val queryPopularityCounter = stringPrefixCounter(defUpdate {
+      case pv: ProductView => normalize(pv.query)
+    })
 
     def suggest(query: String, limit: Int): Array[String] = {
-      suggestModel.suggest(query, limit)
-    }
-
-    override protected def consume(e: Event) = {
-      e match {
-        case pu: ProductUpdate =>
-          catalog += pu.sku -> pu
-        case _ =>
-      }
-      suggestModel.update(e)
-      super.consume(e)
+      queryPopularityCounter.prefixSearch(normalize(query)).toArray.sortBy(_._2).map(_._1).take(limit)
     }
   }
 
-  ep.start()
-  ep.process(ProductsReader.fromFile(productsFn))
-  val df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
-  val backupDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-  def getTime(timeStr: String): Long = {
-    try {
-      df.parse(timeStr).getTime
-    } catch {
-      case e: java.text.ParseException => backupDf.parse(timeStr).getTime
+  val weights = WeightsReader.getWeights(new File(weightsFn).toURI.toURL)
+  val allDocs = new AllDocs
+  val ranker = new Ranker(model, weights, allDocs)
+
+  var eventCt = 0
+  eventHistory.getEvents(Long.MinValue, Long.MaxValue, _ => true, (e: Event) => {
+    // TODO skip duplicate product updates <= make this part of the model
+    model.update(e)
+    suggestModel.update(e)
+    e match {
+      case pu: ProductUpdate =>
+        allDocs.addDoc(pu.sku)
+        catalog += pu.sku -> pu
+      case _ =>
     }
-  }
-  ep.process(EventSource.fromFile(viewsFn).map(fields =>
-    new ProductView(getTime(fields("click_time")), getTime(fields("query_time")),
-      getUser(fields("user")), fields("query"), fields("sku").toLong)))
+    eventCt += 1
+    true
+  })
+  logger.info(s"updated $eventCt events")
 
   case class Query(query: String)
   case class Results(success: Boolean, data: Array[Long])
@@ -90,10 +64,10 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
   case class ResultsWithTitles(success: Boolean, results: Array[ProductDescription],
                                 inferredQuery: String)
 
-  private def buildResults(results: TopDocsResult) : ResultsWithTitles = {
+  private def buildResults(ctx: ProductSearchScoringContext, results: TopDocsResult[ProductSearchScoringContext]) : ResultsWithTitles = {
     new ResultsWithTitles(success = true,
       results = results.topDocs.map(sku => ProductDescription(sku, catalog(sku).name)),
-      inferredQuery = if (results.inferredQuery.isDefined) results.inferredQuery.get else null
+      inferredQuery = if (ctx.query == results.executedCtx.query) null else results.executedCtx.query
     )
   }
 
@@ -112,7 +86,7 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
     val query = params("query")
     logger.info(s"getting completion prediction for $query")
     try {
-      ep.suggest(query, 10).toList
+      suggestModel.suggest(query, 10).toList
     } catch {
       case e: Exception =>
         logger.error("problem in suggestions", e)
@@ -121,10 +95,15 @@ class BestBuyDemoServlet extends AntelopeBestBuyDemoStack with JacksonJsonSuppor
   }
 
   post("/search") {
-    val query = params("query")
-    logger.info(s"doing a search for '$query'")
-    val results = ep.topDocs(query, Long.MaxValue, 10)
-    buildResults(results)
+    val queryStr = params("query")
+    logger.info(s"doing a search for '$queryStr'")
+    val ctx = new ProductSearchScoringContext {
+      override val t = Long.MaxValue
+      override val query = queryStr
+    }
+    val results = ranker.topN(ctx, 10)
+    logger.info(s"number of results is ${results.topDocs.size}")
+    buildResults(ctx, results)
   }
   
 }

@@ -69,12 +69,16 @@ class User(val profile: UserProfile,
     }
   }
 
+  /**
+   * We map user activity onto a scale of 0-1 using a logit transformation
+   *
+   * @param delta
+   */
   private def activityTransform(delta: Double): Unit = {
+    def transform(x: Double, delta: Double): Double = {
+      1D / (1D + math.exp(-(math.log(x/(1-x)) + delta)))
+    }
     activity = transform(activity, delta)
-  }
-
-  private def transform(x: Double, delta: Double): Double = {
-    1D / (1D + math.exp(-(math.log(x/(1-x)) + delta)))
   }
 
   private def queueEvaluateLike(user: User, recommendation: Recommendation): Unit = {
