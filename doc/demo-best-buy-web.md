@@ -36,3 +36,7 @@ Try making simple typos:
 To shut down the web application execute the stop command within sbt
 
     container:stop
+
+## Next
+
+Check out the [dating simulation demo](demo-dating-simulation.html).

@@ -42,6 +42,12 @@ Use your browser to download the following files, placing them in $ANTELOPE_DATA
 * <https://www.kaggle.com/c/acm-sf-chapter-hackathon-small/download/small_product_data.xml>
 * <https://www.kaggle.com/c/acm-sf-chapter-hackathon-small/download/train.csv>
 
+Place the training data in the appropriate folder, e.g.,
+
+    mv ~/Downloads/train.csv $ANTELOPE_DATA
+    mkdir -p $ANTELOPE_DATA/product_data/products
+    mv ~/Downloads/small_product_data.xml $ANTELOPE_DATA/product_data/products
+
 Sort the training data set so that events are ordered according to click time
 
     cd $ANTELOPE_DATA
@@ -51,7 +57,7 @@ Sort the training data set so that events are ordered according to click time
 
 ## Generate training data
 
-You will now use Antelope to generate training data
+You will now use Antelope to generate training data. To proceed you must first install [Scala](www.scala-lang.org) with sbt by following the [sbt installation instructions for your platform](http://www.scala-sbt.org/release/tutorial/Setup.html). Then go ahead and start sbt.
 
     cd $ANTELOPE_DEMO/antelope
     sbt
@@ -77,38 +83,32 @@ section.  This demo ships with effective model parameters.
 
 Your coefficients should look like the following
 
-    59.3188,42.97628,0.1188885,-0.01602002,1.371848,0.1308245
+    51.50027,40.53215,0.1162305,-0.02048718,1.174933,0.1279296
 
-You can verify that these are hardcoded in the class
-[co.ifwe.antelope.bestbuy.exec.LearnedRankerScoring]({{ "/demo-best-buy/src/main/scala/co/ifwe/antelope/bestbuy/exec/LearnedRankerScoring.scala" | prepend: site.githubsrc}} ).
-There is no need to change these now, but if you change the model definition you will need to do so.
+The coeficcients you have generated will be read from this file when scoring the model.
 
 ## Score the model
 
 Now back in sbt execute the following
 
-    project demo
+    project demo-best-buy
     runMain co.ifwe.antelope.bestbuy.exec.LearnedRankerScoring
 
 You should see something like the following final output
 
-    progress 38500
-    progress 39000
-    progress 39500
-    progress 40000
-    co.ifwe.antelope.bestbuy.model.BestBuyModel@44ff1bb3 finishing with stats: 8399/10000 hits for 84.0%
-    correction types
-    extra space: 94
-    missingSpace: 39
-    extraLetters: 9
-    missingLetters: 8
-    changeLetters: 6
+    Miss Analysis
+    Candidates for spelling correction
+    extra space: 144
+    missingSpace: 35
+    extraLetters: 5
+    missingLetters: 3
+    changeLetters: 4
     transposeLetters: 0
-    total correctable: 156
-    total missed 3202
+    total correctable: 191
+    total missed 2790
     ()
-    completed 40000 in 17469 ms, rate of 2289/s
-    [success] Total time: 19 s, completed Apr 21, 2015 9:30:39 PM
+    Overall success rate: 8605/10000 hits for 86.1%
+    [success] Total time: 12 s, completed Aug 10, 2015 5:31:13 PM
 
 That's it, you've successfully trained and scored a model!  In this case the hit percentage represents the
 fraction of rankings that contain the product viewed by the user within the first top 5 results.
@@ -118,7 +118,7 @@ fraction of rankings that contain the product viewed by the user within the firs
 The demo model is implemented in [co.ifwe.antelope.bestbuy.model.BestBuyModel]({{"/demo-best-buy/src/main/scala/co/ifwe/antelope/bestbuy/model/BestBuyModel.scala" | prepend: site.githubsrc }}).
 You might first try removing features and comparing performance.  After that, try writing your own features.
 
-The demo framework instantiates the model in [co.ifwe.antelope.bestbuy.ModelEventProcessor]({{"/demo-best-buy/src/main/scala/co/ifwe/antelope/bestbuy/ModelEventProcessor.scala" | prepend: site.githubsrc }}).
+The demo framework instantiates the model in [co.ifwe.antelope.bestbuy.Env]({{"/demo-best-buy/src/main/scala/co/ifwe/antelope/bestbuy/Env.scala" | prepend: site.githubsrc }}).
 If you want to swap out model classes, go ahead and modify this file.  You may find it more intuitive to start out
 using the simpler [co.ifwe.antelope.bestbuy.model.DemoBestBuyModel]({{"/demo-best-buy/src/main/scala/co/ifwe/antelope/bestbuy/model/DemoBestBuyModel.scala" | prepend: site.githubsrc }}),
 which uses nested classes to define features, which can make simple models simpler to follow.

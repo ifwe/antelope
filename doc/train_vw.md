@@ -2,6 +2,9 @@
 layout: doc-page
 title: Train a Model Using Vowpal Wabbit
 ---
+
+*This documentation may require some updates as we have changed how model parameters are read*
+
 Should you wish to train model coefficients using Vowpal Wabbit please
 follow the instructions below.
 

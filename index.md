@@ -7,9 +7,8 @@ layout: page
 </p>
 
 The *Antelope Realtime Events* project aims to make iterative and agile machine learning
-a practical reality, especially in systems that must respond immediately to new
-circumstances.  It derives from a proprietary framework used by
-[if(we)](http://www.ifwe.co/) to develop recommendation engines for our social products.
+a practical reality, especially in systems that must repsond quickly to updated information.  It derives from a proprietary framework used by
+[if(we)](http://www.ifwe.co/) to develop recommendation engines for our social products, [hi5](http://www.hi5.com/) and [Tagged](http://www.tagged.com).
 By unifying the software that data scientists use to extract data for training a
 machine learning model with the software used to run that model in production, a much
 faster progress cycle becomes possible.
