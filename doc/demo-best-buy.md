@@ -85,7 +85,7 @@ Your coefficients should look like the following
 
     51.50027,40.53215,0.1162305,-0.02048718,1.174933,0.1279296
 
-The coeficcients you have generated will be read from this file when scoring the model.
+The coefficients you have generated will be read from this file when scoring the model.
 
 ## Score the model
 
